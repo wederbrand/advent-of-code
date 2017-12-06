@@ -1,4 +1,4 @@
-package advent_2017;
+package se.wederbrand.advent_2017;
 
 import org.junit.Test;
 

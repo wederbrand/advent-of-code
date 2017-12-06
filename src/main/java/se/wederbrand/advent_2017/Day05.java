@@ -1,4 +1,4 @@
-package advent_2017;
+package se.wederbrand.advent_2017;
 
 public class Day05 {
 	public int part1(String input) {
