@@ -1318,7 +1318,7 @@ public class Day07Test {
 
 	@Test
 	public void testPart2() throws Exception {
-		assertEquals(60, new Day07().part1("pbga (66)\n" +
+		assertEquals(60, new Day07().part2("pbga (66)\n" +
 			"xhth (57)\n" +
 			"ebii (61)\n" +
 			"havc (66)\n" +
