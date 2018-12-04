@@ -35,7 +35,7 @@ func main() {
 		fabrics = append(fabrics, f)
 	}
 
-	var overlaps [10001][10001]int
+	var overlaps [1001][1001]int
 
 	for _, f := range fabrics {
 		for i := f.x; i < f.w+f.x; i++ {
