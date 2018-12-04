@@ -1,55 +1,140 @@
 package main
 
 import (
-	"sort"
-	"fmt"
 	"strconv"
-	"regexp"
-	"os"
 	"bufio"
+	"fmt"
+	"os"
+	"regexp"
+	"sort"
+	"time"
 )
+
+type input struct {
+	logTime time.Time
+	action  string
+}
+
+type By func(p1, p2 *input) bool
+
+func (by By) Sort(inputs []input) {
+	ps := &inputSorter{
+		inputs: inputs,
+		by:     by,
+	}
+	sort.Sort(ps)
+}
+
+type inputSorter struct {
+	inputs []input
+	by     func(p1, p2 *input) bool
+}
+
+func (s *inputSorter) Len() int {
+	return len(s.inputs)
+}
+
+func (s *inputSorter) Swap(i, j int) {
+	s.inputs[i], s.inputs[j] = s.inputs[j], s.inputs[i]
+}
+
+func (s *inputSorter) Less(i, j int) bool {
+	return s.by(&s.inputs[i], &s.inputs[j])
+}
+
+type guard struct {
+	id int
+	minutes map[int]int
+}
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	lineMatcher := regexp.MustCompile(`^\[....-..-.. ..:(\d+)\] (.*)$`)
+	lineMatcher := regexp.MustCompile(`^\[(.+)\] (.*)$`)
 
-	lines := make(map[int]string, 0)
-	minutes := make([]int, 0)
+	lines := make([]input, 0)
 	for scanner.Scan() {
 		sValue := scanner.Text()
 		lineMatch := lineMatcher.FindStringSubmatch(sValue)
-		minute, _ := strconv.Atoi(lineMatch[1])
-		lines[minute] = lineMatch[2]
-		minutes = append(minutes, minute)
+		logTime, _ := time.Parse("2006-01-02 15:04", lineMatch[1])
+		action := lineMatch[2]
+		i := input{logTime, action}
+		lines = append(lines, i)
 	}
 
-	sort.Ints(minutes)
+	timeValue := func(p1, p2 *input) bool {
+		return p1.logTime.Before(p2.logTime)
+	}
 
+	By(timeValue).Sort(lines)
+
+	guards := make(map[int]guard, 0)
+	var currentGuard guard
+	
 	guardMatcher := regexp.MustCompile(`^Guard #(\d+) begins shift$`)
-	sleep := make(map[int]int, 0)
 	sleepSince := 0
-	guard := 0
-
-	for _, m := range minutes {
-		fmt.Println("minute:", m)
-		fmt.Println("line:", lines[m])
-		guardMatch := guardMatcher.FindStringSubmatch(lines[m])
-		if (guardMatch != nil) {
+	for _, line := range lines {
+		guardMatch := guardMatcher.FindStringSubmatch(line.action)
+		if guardMatch != nil {
+			// new guard
+			guardIndex, _ := strconv.Atoi(guardMatch[1])
+			currentGuard = guards[guardIndex]
+			if (currentGuard.minutes == nil) {
+				currentGuard.id = guardIndex
+				currentGuard.minutes = make(map[int]int)
+			}			
+		} else {
 			// no new guard
-			if (lines[m][0] == 'f') {
+			if line.action[0] == 'f' {
 				// falls asleep
-				sleepSince = m
+				sleepSince = line.logTime.Minute()
 			} else {
 				// wakes up
-				sleep[guard] += m - sleepSince
+				for i := sleepSince ; i < line.logTime.Minute() ; i++ {
+					currentGuard.minutes[i]++
+				}				
+				// this is good time to store the guard back
+				guards[currentGuard.id] = currentGuard
 			}
-		} else {
-			// new guard
-			guard, _ = strconv.Atoi(guardMatch[1])
-		}	
+		}
 	}
 
-	fmt.Println(sleep)
-}
+	sleepyGuard := currentGuard
+	maxSleep := 0
+	for _, currentGuard = range guards {
+		totalSleep := 0
+		for _, minutes := range currentGuard.minutes {
+			totalSleep += minutes
+		}
+		if (totalSleep > maxSleep) {
+			sleepyGuard = currentGuard
+			maxSleep = totalSleep
+		}
+	}
 
+	sleepyTime := 0
+	maxMins := 0
+	for i, m := range sleepyGuard.minutes {
+		if (m > maxMins) {
+			sleepyTime = i
+			maxMins = m
+		}
+	}
+
+	fmt.Println("part 1:", sleepyGuard.id, sleepyTime, sleepyGuard.id*sleepyTime)
+
+	maxFreq := 0
+	maxMinute := 0
+	for _, currentGuard := range guards {
+		for minute, freq := range currentGuard.minutes {
+			if (freq > maxFreq) {
+				maxMinute = minute;
+				maxFreq = freq
+				sleepyGuard = currentGuard
+			}
+		}
+	}
+
+	fmt.Println("part 2:", sleepyGuard.id, maxMinute, sleepyGuard.id*maxMinute)
+
+}
