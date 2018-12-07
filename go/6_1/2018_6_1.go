@@ -15,6 +15,10 @@ type Coord struct {
 }
 
 var world [500][500]Coord
+var world2 [500][500]bool
+
+const limit = 10000
+
 var coords = make([]Coord, 0)
 
 var COLLISION = Coord{-1, -1}
@@ -35,8 +39,21 @@ func closest(x, y int) Coord {
 	return closest
 }
 
+func closeEnough(x, y int) bool {
+	dist := 0
+	for _, coord := range coords {
+		dist += int(math.Abs(float64(coord.x-x)) + math.Abs(float64(coord.y-y)))
+	}
+
+	if dist < limit {
+		return true
+	} else {
+		return false
+	}
+}
+
 func main() {
-	file, err := os.Open("2018_6.input");
+	file, err := os.Open("2018_6.input")
 	if err != nil {
 		panic(err)
 	}
@@ -54,14 +71,19 @@ func main() {
 	for x := range world {
 		for y := range world[x] {
 			world[x][y] = closest(x, y)
+			world2[x][y] = closeEnough(x, y)
 		}
 	}
 
 	// mark the ones on the edges as useless
 	inf := make(map[Coord]bool, 0)
 
+	totalSize := 0
 	for x := range world {
 		for y := range world[x] {
+			if world2[x][y] {
+				totalSize++
+			}
 			if x == 0 || x == len(world)-1 || y == 0 || y == len(world[x])-1 {
 				inf[world[x][y]] = true
 			}
@@ -76,7 +98,7 @@ func main() {
 			for x := range world {
 				for y := range world[x] {
 					if world[x][y] == coord {
-						size++;
+						size++
 					}
 				}
 			}
@@ -87,5 +109,6 @@ func main() {
 		}
 	}
 
-	fmt.Println(maxSize)
+	fmt.Println("part 1", maxSize)
+	fmt.Println("part 2", totalSize)
 }
