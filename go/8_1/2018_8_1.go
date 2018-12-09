@@ -42,6 +42,25 @@ func sum(n Node) int {
 	return total
 }
 
+func sum2(n Node) int {
+	total := 0
+
+	if len(n.children) == 0 {
+		for i := 0; i < len(n.metadata); i++ {
+			total += n.metadata[i]
+		}
+	}
+
+	for i := 0; i < len(n.metadata); i++ {
+		childIndex := n.metadata[i] - 1
+		if childIndex < len(n.children) {
+			total += sum2(n.children[childIndex])
+		}
+	}
+
+	return total
+}
+
 var input = make([]int, 0)
 
 func main() {
@@ -60,4 +79,6 @@ func main() {
 	rootNode, _ := parseInput(0)
 
 	fmt.Println("part1", sum(rootNode))
+
+	fmt.Println("part2", sum2(rootNode))
 }
