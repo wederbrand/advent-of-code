@@ -11,7 +11,7 @@ import (
 
 var iterations = make([][]rune, 0)
 var mapper = make(map[string]rune)
-var runs = 1000
+var runs = 200
 var offset = runs * 2
 
 func main() {
@@ -63,13 +63,15 @@ func main() {
 			}
 		}
 		sum := 0
-		for j := start-2; j < stop+2; j++ {
+		for j := start - 2; j < stop+2; j++ {
 			runes := previous[j-2 : j+3]
 			key := string(runes)
 			r, ok := mapper[key]
 			if ok {
 				pots[j] = r
-				sum += j-offset
+				if r == '#' {
+					sum += j - offset
+				}
 			} else {
 				pots[j] = '.'
 			}
@@ -78,4 +80,9 @@ func main() {
 		fmt.Println(i, sum, sum-lastSum, string(pots))
 		lastSum = sum
 	}
+	
+	fmt.Println(lastSum)
+
+	// not 8550000001881
+	// not 8550000002052
 }
