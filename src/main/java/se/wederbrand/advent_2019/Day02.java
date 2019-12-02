@@ -26,13 +26,13 @@ public class Day02 {
 	}
 
 	public long part2(String input) {
-		int noun=0;
-		int verb=0;
-		int target = 19690720;
-		while (part1(input, noun, verb) != target) {
-
+		for (int i = 0; i < 99; i++) {
+			for (int j = 0; j < 99; j++) {
+				if (part1(input, i, j) == 19690720) {
+					return i * 100 + j;
+				}
+			}
 		}
-		return noun*100 + verb;
+		return 0;
 	}
-
 }
