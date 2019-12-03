@@ -78,13 +78,84 @@ public class Day03 {
 
 		return minDistance;
 	}
+	public long part2(String input) {
+		HashMap<String, Long> map = new HashMap<>();
+
+		String[] wires = input.split(System.lineSeparator());
+		String[] wire0 = wires[0].split((","));
+		String[] wire1 = wires[1].split((","));
+
+		int x = 0;
+		int y = 0;
+
+		map.put(getKey(x, y), 0L);
+
+		long totalDistanceTraveled = 0;
+		for (String line : wire0) {
+			String direction = line.substring(0, 1);
+			int length = Integer.parseInt(line.substring(1));
+
+			for (int i = 0; i < length; i++) {
+				switch (direction) {
+					case "U":
+						y++;
+						break;
+					case "D":
+						y--;
+						break;
+					case "R":
+						x++;
+						break;
+					case "L":
+						x--;
+						break;
+				}
+				totalDistanceTraveled++;
+				map.putIfAbsent(getKey(x, y), totalDistanceTraveled);
+			}
+		}
+
+		x = 0;
+		y = 0;
+		long minDistance = Integer.MAX_VALUE;
+
+		totalDistanceTraveled = 0;
+		for (String line : wire1) {
+			String direction = line.substring(0, 1);
+			int length = Integer.parseInt(line.substring(1));
+
+			for (int i = 0; i < length; i++) {
+				switch (direction) {
+					case "U":
+						y++;
+						break;
+					case "D":
+						y--;
+						break;
+					case "R":
+						x++;
+						break;
+					case "L":
+						x--;
+						break;
+				}
+				totalDistanceTraveled++;
+
+				if (map.containsKey(getKey(x, y))) {
+					Long firstPathTraveled = map.get(getKey(x, y));
+					long distance = firstPathTraveled + totalDistanceTraveled;
+					if (distance < minDistance) {
+						minDistance = distance;
+					}
+				}
+			}
+
+		}
+
+		return minDistance;
+	}
 
 	private String getKey(int x, int y) {
 		return x + "," + y;
 	}
-
-	public long part2(String input) {
-		return 0;
-	}
-
 }
