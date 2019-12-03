@@ -1,19 +1,20 @@
 package se.wederbrand.advent_2019;
 
+import java.util.HashMap;
+
 public class Day03 {
 
 	public long part1(String input) {
-		String[][] map = new String[1000][1000];
-		int offset = 500;
+		HashMap<String, String> map = new HashMap<>();
 
 		String[] wires = input.split(System.lineSeparator());
 		String[] wire0 = wires[0].split((","));
 		String[] wire1 = wires[1].split((","));
 
-		int x = offset;
-		int y = offset;
+		int x = 0;
+		int y = 0;
 
-		map[x][y] = ".";
+		map.put(getKey(x, y), ".");
 
 		for (String line : wire0) {
 			String direction = line.substring(0, 1);
@@ -34,12 +35,12 @@ public class Day03 {
 						x--;
 						break;
 				}
-				map[x][y] = "1";
+				map.put(getKey(x, y), "1");
 			}
 		}
 
-		x = offset;
-		y = offset;
+		x = 0;
+		y = 0;
 		int minDistance = Integer.MAX_VALUE;
 
 		for (String line : wire1) {
@@ -62,20 +63,24 @@ public class Day03 {
 						break;
 				}
 
-				if (map[x][y] !=  null && map[x][y].equals("1")) {
-					map[x][y] = "3";
-					int distance = x-offset + y - offset;
+				if (map.getOrDefault(getKey(x, y), "").equals("1")) {
+					map.put(getKey(x, y), "3");
+					int distance = Math.abs(x) + Math.abs(y);
 					if (distance < minDistance) {
 						minDistance = distance;
 					}
 				} else {
-					map[x][y] = "2";
+					map.put(getKey(x, y), "3");
 				}
 			}
 
 		}
 
 		return minDistance;
+	}
+
+	private String getKey(int x, int y) {
+		return x + "," + y;
 	}
 
 	public long part2(String input) {
