@@ -14,16 +14,18 @@ public class Day05Test {
 
 	@Test
 	public void actualPart1() throws Exception {
-		System.out.println(new Day05().part1(INPUT, 1));
+		new Day05().machine(INPUT, 1);
 	}
 
 	@Test
 	public void testPart2() throws Exception {
+		new Day05().machine("3,9,8,9,10,9,4,9,99,-1,8", 8); // should be 1
+		new Day05().machine("3,9,8,9,10,9,4,9,99,-1,8", 9); // should be 0
 	}
 
 	@Test
 	public void actualPart2() throws Exception {
-		System.out.println(new Day05().part2(INPUT));
+		new Day05().machine(INPUT, 5);
 	}
 
 }
