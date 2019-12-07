@@ -19,23 +19,23 @@ public class Day07 implements Runnable {
 		this.outputQueue = outputQueue;
 	}
 
-	public static List<int[]> getPermutations() {
+	public static List<int[]> getPermutations(int min, int max) {
 		List<int[]> permutations = new ArrayList<>();
 
-		for (int a = 0; a < 5; a++) {
-			for (int b = 0; b < 5; b++) {
+		for (int a = min; a <= max; a++) {
+			for (int b = min; b <= max; b++) {
 				if (b == a) {
 					continue;
 				}
-				for (int c = 0; c < 5; c++) {
+				for (int c = min; c <= max; c++) {
 					if (c == a || c == b) {
 						continue;
 					}
-					for (int d = 0; d < 5; d++) {
+					for (int d = min; d <= max; d++) {
 						if (d == a || d == b || d == c) {
 							continue;
 						}
-						for (int e = 0; e < 5; e++) {
+						for (int e = min; e <= max; e++) {
 							if (e == a || e == b || e == c || e == d) {
 								continue;
 							}
@@ -81,15 +81,55 @@ public class Day07 implements Runnable {
 		return aInput.take();
 	}
 
-	public int machineOfLoopingMachines(int a, int b, int c, int d, int e, String input) {
-		return 0;
+	public static int machineOfLoopingMachines(int a, int b, int c, int d, int e, String input) throws InterruptedException {
+		ArrayBlockingQueue<Integer> aInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> bInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> cInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> dInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> eInput = new ArrayBlockingQueue<>(2);
+
+		aInput.put(a);
+		aInput.put(0);
+		bInput.put(b);
+		cInput.put(c);
+		dInput.put(d);
+		eInput.put(e);
+
+		Day07 dayA = new Day07("a", input, aInput, bInput);
+		Day07 dayB = new Day07("b", input, bInput, cInput);
+		Day07 dayC = new Day07("c", input, cInput, dInput);
+		Day07 dayD = new Day07("d", input, dInput, eInput);
+		Day07 dayE = new Day07("e", input, eInput, aInput);
+
+		new Thread(dayA).start();
+		new Thread(dayB).start();
+		new Thread(dayC).start();
+		new Thread(dayD).start();
+		Thread thread = new Thread(dayE);
+		thread.start();
+		thread.join();
+
+		return aInput.take();
 	}
 
 	public static int bestOfMachines(String input) throws InterruptedException {
-		List<int[]> permutations = getPermutations();
+		List<int[]> permutations = getPermutations(0, 4);
 		int max = 0;
 		for (int[] permutation : permutations) {
 			int i = machineOfMachines(permutation[0], permutation[1], permutation[2], permutation[3], permutation[4], input);
+			if (i > max) {
+				max = i;
+			}
+		}
+
+		return max;
+	}
+
+	public static int bestOfLoopingMachines(String input) throws InterruptedException {
+		List<int[]> permutations = getPermutations(5, 9);
+		int max = 0;
+		for (int[] permutation : permutations) {
+			int i = machineOfLoopingMachines(permutation[0], permutation[1], permutation[2], permutation[3], permutation[4], input);
 			if (i > max) {
 				max = i;
 			}
