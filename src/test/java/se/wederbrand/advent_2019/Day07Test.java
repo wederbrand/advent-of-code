@@ -10,15 +10,15 @@ public class Day07Test {
 
 	@Test
 	public void testPart1() throws Exception {
-		assertEquals(43210, Day07.machineOfMachines(4,3,2,1,0, "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"));
-		assertEquals(54321, Day07.machineOfMachines(0,1,2,3,4, "3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0"));
+		assertEquals(43210, Day07.machineOfLoopingMachines(4,3,2,1,0, "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"));
+		assertEquals(54321, Day07.machineOfLoopingMachines(0,1,2,3,4, "3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0"));
 
-		assertEquals(43210, Day07.bestOfMachines("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"));
+		assertEquals(43210, Day07.bestOfLoopingMachines("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0", 0, 4));
 	}
 
 	@Test
 	public void actualPart1() throws Exception {
-		System.out.println(Day07.bestOfMachines(INPUT));
+		System.out.println(Day07.bestOfLoopingMachines(INPUT, 0, 4));
 	}
 
 	@Test
@@ -29,7 +29,7 @@ public class Day07Test {
 
 	@Test
 	public void actualPart2() throws Exception {
-		System.out.println(Day07.bestOfLoopingMachines(INPUT));
+		System.out.println(Day07.bestOfLoopingMachines(INPUT, 5, 9));
 	}
 
 }
