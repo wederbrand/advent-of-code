@@ -1,20 +1,44 @@
 package se.wederbrand.advent_2019;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.*;
 
-public class Day07 {
-	public List<int[]> getPermutations() {
+public class Day07 implements Runnable {
+
+	private final String name;
+	private String input;
+	private BlockingQueue<Integer> inputQueue;
+	private BlockingQueue<Integer> outputQueue;
+
+	public Day07(String name, String input, BlockingQueue<Integer> inputQueue, BlockingQueue<Integer> outputQueue) {
+		this.name = name;
+		this.input = input;
+		this.inputQueue = inputQueue;
+		this.outputQueue = outputQueue;
+	}
+
+	public static List<int[]> getPermutations() {
 		List<int[]> permutations = new ArrayList<>();
 
 		for (int a = 0; a < 5; a++) {
 			for (int b = 0; b < 5; b++) {
-				if (b==a) continue;
+				if (b == a) {
+					continue;
+				}
 				for (int c = 0; c < 5; c++) {
-					if (c==a || c==b) continue;
+					if (c == a || c == b) {
+						continue;
+					}
 					for (int d = 0; d < 5; d++) {
-						if (d==a || d==b || d==c) continue;
+						if (d == a || d == b || d == c) {
+							continue;
+						}
 						for (int e = 0; e < 5; e++) {
-							if (e==a || e==b || e==c || e==d) continue;
+							if (e == a || e == b || e == c || e == d) {
+								continue;
+							}
 							int[] permutation = {a, b, c, d, e};
 							permutations.add(permutation);
 						}
@@ -26,55 +50,47 @@ public class Day07 {
 		return permutations;
 	}
 
-	public int machineOfMachines(int a, int b, int c, int d, int e, String input) {
-		Stack<Integer> ints = new Stack<>();
-		ints.push(0);
-		ints.push(a);
-		ints.push(machine(input, ints));
-		ints.push(b);
-		ints.push(machine(input, ints));
-		ints.push(c);
-		ints.push(machine(input, ints));
-		ints.push(d);
-		ints.push(machine(input, ints));
-		ints.push(e);
-		return machine(input, ints);
+	public static int machineOfMachines(int a, int b, int c, int d, int e, String input) throws InterruptedException {
+		ArrayBlockingQueue<Integer> aInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> bInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> cInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> dInput = new ArrayBlockingQueue<>(2);
+		ArrayBlockingQueue<Integer> eInput = new ArrayBlockingQueue<>(2);
+
+		aInput.put(a);
+		aInput.put(0);
+		bInput.put(b);
+		cInput.put(c);
+		dInput.put(d);
+		eInput.put(e);
+		
+		Day07 dayA = new Day07("a", input, aInput, bInput);
+		Day07 dayB = new Day07("b", input, bInput, cInput);
+		Day07 dayC = new Day07("c", input, cInput, dInput);
+		Day07 dayD = new Day07("d", input, dInput, eInput);
+		Day07 dayE = new Day07("e", input, eInput, aInput);
+
+		new Thread(dayA).start();
+		new Thread(dayB).start();
+		new Thread(dayC).start();
+		new Thread(dayD).start();
+		Thread thread = new Thread(dayE);
+		thread.start();
+		thread.join();
+
+		return aInput.take();
 	}
 
 	public int machineOfLoopingMachines(int a, int b, int c, int d, int e, String input) {
-		Stack<Integer> ints = new Stack<>();
-		ints.push(0);
-		ints.push(a);
-		ints.push(machine(input, ints));
-		ints.push(b);
-		ints.push(machine(input, ints));
-		ints.push(c);
-		ints.push(machine(input, ints));
-		ints.push(d);
-		ints.push(machine(input, ints));
-		ints.push(e);
-		ints.push(machine(input, ints));
-
-		//  now loop
-		try {
-			int i = 0;
-			while (true) {
-				ints.push(machine(input, ints));
-			}
-		}
-		catch (Exception ex) {
-			System.out.println("done");
-		}
-
-		return ints.pop();
+		return 0;
 	}
 
-	public int bestOfMachines(String input) {
+	public static int bestOfMachines(String input) throws InterruptedException {
 		List<int[]> permutations = getPermutations();
 		int max = 0;
 		for (int[] permutation : permutations) {
 			int i = machineOfMachines(permutation[0], permutation[1], permutation[2], permutation[3], permutation[4], input);
-			if (i>max) {
+			if (i > max) {
 				max = i;
 			}
 		}
@@ -82,7 +98,8 @@ public class Day07 {
 		return max;
 	}
 
-	public int machine(String input, Stack<Integer> inputTo3) {
+	@Override
+	public void run() {
 		int[] ints = Arrays.stream(input.split(",")).mapToInt(Integer::parseInt).toArray();
 		int i = 0;
 		outer:
@@ -106,27 +123,48 @@ public class Day07 {
 				case 1: // +
 					ints[ints[i + 3]] = param1 + param2;
 					i += 4;
-				break;
+					break;
 				case 2: // *
 					ints[ints[i + 3]] = param1 * param2;
 					i += 4;
-				break;
+					break;
 				case 3: // input
-					ints[ints[i + 1]] = inputTo3.pop();
+					try {
+//						System.out.println(name + " taking from queue of size " + inputQueue.size());
+						ints[ints[i + 1]] = inputQueue.take();
+					}
+					catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					i += 2;
 					break;
 				case 4: // output
 					if (c == 0) {
-						return ints[ints[i + 1]];
-					} else {
-						return ints[i + 1];
+						try {
+//							System.out.println(name + " posting in queue of size " + outputQueue.size());
+							outputQueue.put(ints[ints[i + 1]]);
+						}
+						catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
+					else {
+						try {
+//							System.out.println(name + " posting in queue of size " + outputQueue.size());
+							outputQueue.put(ints[i + 1]);
+						}
+						catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+					i += 2;
+					break;
 				case 5: // jump if true
 					if (param1 != 0) {
 						i = param2;
 					}
 					else {
-						i+=3;
+						i += 3;
 					}
 					break;
 				case 6: // jump if false
@@ -134,7 +172,7 @@ public class Day07 {
 						i = param2;
 					}
 					else {
-						i+=3;
+						i += 3;
 					}
 					break;
 				case 7: // less than
@@ -144,7 +182,7 @@ public class Day07 {
 					else {
 						ints[ints[i + 3]] = 0;
 					}
-					i+=4;
+					i += 4;
 					break;
 				case 8: // equals
 					if (param1 == param2) {
@@ -153,10 +191,11 @@ public class Day07 {
 					else {
 						ints[ints[i + 3]] = 0;
 					}
-					i+=4;
+					i += 4;
 					break;
 				case 99:
-					throw new RuntimeException("done");
+					System.out.println(name +" EXIT");
+					break outer;
 			}
 		}
 	}
