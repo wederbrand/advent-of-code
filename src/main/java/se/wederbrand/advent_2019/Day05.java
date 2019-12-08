@@ -1,8 +1,24 @@
 package se.wederbrand.advent_2019;
 
 import java.util.Arrays;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class Day05 {
+	public static int refactoredMachine(String input, int inputTo3) throws InterruptedException {
+		ArrayBlockingQueue<Integer> aInput = new ArrayBlockingQueue<>(100);
+		ArrayBlockingQueue<Integer> bInput = new ArrayBlockingQueue<>(100);
+
+		aInput.put(inputTo3);
+
+		IntcodeComputer intcodeComputer = new IntcodeComputer("day 5", input, aInput, bInput);
+		intcodeComputer.run();
+		int last = 0;
+		while (!bInput.isEmpty()) {
+			last = bInput.poll();
+		}
+		return last;
+	}
+
 	public void machine(String input, int inputTo3) {
 		int[] ints = Arrays.stream(input.split(",")).mapToInt(Integer::parseInt).toArray();
 		int i = 0;

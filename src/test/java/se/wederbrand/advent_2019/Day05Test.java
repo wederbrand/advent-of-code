@@ -14,7 +14,7 @@ public class Day05Test {
 
 	@Test
 	public void actualPart1() throws Exception {
-		new Day05().machine(INPUT, 1);
+		System.out.println(Day05.refactoredMachine(INPUT, 1));
 	}
 
 	@Test
