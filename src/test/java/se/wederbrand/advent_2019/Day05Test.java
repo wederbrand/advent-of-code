@@ -19,13 +19,13 @@ public class Day05Test {
 
 	@Test
 	public void testPart2() throws Exception {
-		new Day05().machine("3,9,8,9,10,9,4,9,99,-1,8", 8); // should be 1
-		new Day05().machine("3,9,8,9,10,9,4,9,99,-1,8", 9); // should be 0
+		assertEquals(1, Day05.refactoredMachine("3,9,8,9,10,9,4,9,99,-1,8", 8));
+		assertEquals(0, Day05.refactoredMachine("3,9,8,9,10,9,4,9,99,-1,8", 9));
 	}
 
 	@Test
 	public void actualPart2() throws Exception {
-		new Day05().machine(INPUT, 5);
+		System.out.println(Day05.refactoredMachine(INPUT, 5));
 	}
 
 }
