@@ -5,33 +5,32 @@ import java.util.concurrent.BlockingQueue;
 
 public class IntcodeComputer implements Runnable {
 	private final String name;
-	private String input;
+	private int[] memory;
 	private BlockingQueue<Integer> inputQueue;
 	private BlockingQueue<Integer> outputQueue;
 
-	public IntcodeComputer(String name, String input, BlockingQueue<Integer> inputQueue, BlockingQueue<Integer> outputQueue) {
+	public IntcodeComputer(String name, String code, BlockingQueue<Integer> inputQueue, BlockingQueue<Integer> outputQueue) {
 		this.name = name;
-		this.input = input;
+		this.memory = Arrays.stream(code.split(",")).mapToInt(Integer::parseInt).toArray();
 		this.inputQueue = inputQueue;
 		this.outputQueue = outputQueue;
 	}
 
 	@Override
 	public void run() {
-		int[] ints = Arrays.stream(input.split(",")).mapToInt(Integer::parseInt).toArray();
 		int i = 0;
 		outer:
 		while (true) {
-			int opCode = ints[i] % 100;
-			int c = (ints[i]) / 100 % 10;
-			int b = (ints[i]) / 1000 % 10;
-			int a = (ints[i]) / 10000 % 10;
+			int opCode = memory[i] % 100;
+			int c = (memory[i]) / 100 % 10;
+			int b = (memory[i]) / 1000 % 10;
+			int a = (memory[i]) / 10000 % 10;
 
 			int param1 = 0;
 			int param2 = 0;
 			try {
-				param1 = c == 0 ? ints[ints[i + 1]] : ints[i + 1];
-				param2 = b == 0 ? ints[ints[i + 2]] : ints[i + 2];
+				param1 = c == 0 ? memory[memory[i + 1]] : memory[i + 1];
+				param2 = b == 0 ? memory[memory[i + 2]] : memory[i + 2];
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
 				// ignore, it happens on some instructions
@@ -39,17 +38,17 @@ public class IntcodeComputer implements Runnable {
 
 			switch (opCode) {
 				case 1: // +
-					ints[ints[i + 3]] = param1 + param2;
+					memory[memory[i + 3]] = param1 + param2;
 					i += 4;
 					break;
 				case 2: // *
-					ints[ints[i + 3]] = param1 * param2;
+					memory[memory[i + 3]] = param1 * param2;
 					i += 4;
 					break;
 				case 3: // input
 					try {
 //						System.out.println(name + " taking from queue of size " + inputQueue.size());
-						ints[ints[i + 1]] = inputQueue.take();
+						memory[memory[i + 1]] = inputQueue.take();
 					}
 					catch (InterruptedException e) {
 						e.printStackTrace();
@@ -60,7 +59,7 @@ public class IntcodeComputer implements Runnable {
 					if (c == 0) {
 						try {
 //							System.out.println(name + " posting in queue of size " + outputQueue.size());
-							outputQueue.put(ints[ints[i + 1]]);
+							outputQueue.put(memory[memory[i + 1]]);
 						}
 						catch (InterruptedException e) {
 							e.printStackTrace();
@@ -69,7 +68,7 @@ public class IntcodeComputer implements Runnable {
 					else {
 						try {
 //							System.out.println(name + " posting in queue of size " + outputQueue.size());
-							outputQueue.put(ints[i + 1]);
+							outputQueue.put(memory[i + 1]);
 						}
 						catch (InterruptedException e) {
 							e.printStackTrace();
@@ -95,19 +94,19 @@ public class IntcodeComputer implements Runnable {
 					break;
 				case 7: // less than
 					if (param1 < param2) {
-						ints[ints[i + 3]] = 1;
+						memory[memory[i + 3]] = 1;
 					}
 					else {
-						ints[ints[i + 3]] = 0;
+						memory[memory[i + 3]] = 0;
 					}
 					i += 4;
 					break;
 				case 8: // equals
 					if (param1 == param2) {
-						ints[ints[i + 3]] = 1;
+						memory[memory[i + 3]] = 1;
 					}
 					else {
-						ints[ints[i + 3]] = 0;
+						memory[memory[i + 3]] = 0;
 					}
 					i += 4;
 					break;
@@ -115,5 +114,13 @@ public class IntcodeComputer implements Runnable {
 					break outer;
 			}
 		}
+	}
+
+	public int getMemory(int position) {
+		return memory[position];
+	}
+
+	public void setMemory(int position, int value) {
+		memory[position] = value;
 	}
 }

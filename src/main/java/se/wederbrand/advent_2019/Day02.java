@@ -1,34 +1,26 @@
 package se.wederbrand.advent_2019;
 
 import java.util.Arrays;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class Day02 {
-	public long part1(String input, int noun, int verb) {
-		int[] ints = Arrays.stream(input.split(",")).mapToInt(Integer::parseInt).toArray();
-		int i = 0;
-		ints[1] = noun;
-		ints[2] = verb;
-		outer:
-		while (true) {
-			switch (ints[i]) {
-				case 1:
-					ints[ints[i + 3]] = ints[ints[i + 1]] + ints[ints[i + 2]];
-					break;
-				case 2:
-					ints[ints[i + 3]] = ints[ints[i + 1]] * ints[ints[i + 2]];
-					break;
-				case 99:
-					break outer;
-			}
-			i += 4;
-		}
-		return ints[0];
+	public static int refactoredMachine(String code, int noun, int verb) throws InterruptedException {
+		ArrayBlockingQueue<Integer> input = new ArrayBlockingQueue<>(100);
+		ArrayBlockingQueue<Integer> output = new ArrayBlockingQueue<>(100);
+
+		IntcodeComputer intcodeComputer = new IntcodeComputer("day 2", code, input, output);
+		intcodeComputer.setMemory(1, noun);
+		intcodeComputer.setMemory(2, verb);
+
+		intcodeComputer.run();
+
+		return intcodeComputer.getMemory(0);
 	}
 
-	public long part2(String input) {
+	public long part2(String input) throws InterruptedException {
 		for (int i = 0; i < 99; i++) {
 			for (int j = 0; j < 99; j++) {
-				if (part1(input, i, j) == 19690720) {
+				if (refactoredMachine(input, i, j) == 19690720) {
 					return i * 100 + j;
 				}
 			}

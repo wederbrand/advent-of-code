@@ -10,12 +10,12 @@ public class Day02Test {
 
 	@Test
 	public void testPart1() throws Exception {
-		assertEquals(3500, new Day02().part1("1,9,10,3,2,3,11,0,99,30,40,50", 9, 10));
+		assertEquals(3500, Day02.refactoredMachine ("1,9,10,3,2,3,11,0,99,30,40,50", 9, 10));
 	}
 
 	@Test
 	public void actualPart1() throws Exception {
-		System.out.println(new Day02().part1(INPUT, 12, 2));
+		System.out.println(Day02.refactoredMachine (INPUT, 12, 2));
 	}
 
 	@Test
