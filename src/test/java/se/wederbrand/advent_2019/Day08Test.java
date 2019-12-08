@@ -14,15 +14,17 @@ public class Day08Test {
 
 	@Test
 	public void actualPart1() throws Exception {
-		System.out.println(new Day08().part1(INPUT));
+		System.out.println(new Day08().part1(INPUT, 25, 6));
 	}
 
 	@Test
 	public void testPart2() throws Exception {
+		new Day08().part2("0222112222120000", 2, 2);
 	}
 
 	@Test
 	public void actualPart2() throws Exception {
+		new Day08().part2(INPUT, 25, 6);
 	}
 
 }
