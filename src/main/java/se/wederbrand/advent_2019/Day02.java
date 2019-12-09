@@ -5,16 +5,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class Day02 {
 	public static int refactoredMachine(String code, int noun, int verb) throws InterruptedException {
-		ArrayBlockingQueue<Integer> input = new ArrayBlockingQueue<>(100);
-		ArrayBlockingQueue<Integer> output = new ArrayBlockingQueue<>(100);
-
-		IntcodeComputer intcodeComputer = new IntcodeComputer("day 2", code, input, output);
-		intcodeComputer.setMemory(1, noun);
-		intcodeComputer.setMemory(2, verb);
-
-		intcodeComputer.run();
-
-		return intcodeComputer.getMemory(0);
+return 0;
 	}
 
 	public long part2(String input) throws InterruptedException {

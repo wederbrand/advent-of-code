@@ -38,35 +38,7 @@ public class Day07 {
 	}
 
 	public static int machineOfLoopingMachines(int a, int b, int c, int d, int e, String input) throws InterruptedException {
-		ArrayBlockingQueue<Integer> aInput = new ArrayBlockingQueue<>(2);
-		ArrayBlockingQueue<Integer> bInput = new ArrayBlockingQueue<>(2);
-		ArrayBlockingQueue<Integer> cInput = new ArrayBlockingQueue<>(2);
-		ArrayBlockingQueue<Integer> dInput = new ArrayBlockingQueue<>(2);
-		ArrayBlockingQueue<Integer> eInput = new ArrayBlockingQueue<>(2);
-
-		aInput.put(a);
-		aInput.put(0);
-		bInput.put(b);
-		cInput.put(c);
-		dInput.put(d);
-		eInput.put(e);
-
-		IntcodeComputer dayA = new IntcodeComputer("a", input, aInput, bInput);
-		IntcodeComputer dayB = new IntcodeComputer("b", input, bInput, cInput);
-		IntcodeComputer dayC = new IntcodeComputer("c", input, cInput, dInput);
-		IntcodeComputer dayD = new IntcodeComputer("d", input, dInput, eInput);
-		IntcodeComputer dayE = new IntcodeComputer("e", input, eInput, aInput);
-
-		new Thread(dayA).start();
-		new Thread(dayB).start();
-		new Thread(dayC).start();
-		new Thread(dayD).start();
-		Thread thread = new Thread(dayE);
-		thread.start();
-		thread.join();
-
-		return aInput.take();
-	}
+return 0;	}
 
 	public static int bestOfLoopingMachines(String input, int min, int max) throws InterruptedException {
 		List<int[]> permutations = getPermutations(min, max);
