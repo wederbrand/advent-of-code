@@ -100,10 +100,39 @@ public class Day10Test {
 
 	@Test
 	public void testPart2() throws Exception {
+		new Day10(".#..##.###...#######\n" +
+			"##.############..##.\n" +
+			".#.######.########.#\n" +
+			".###.#######.####.#.\n" +
+			"#####.##.#.##.###.##\n" +
+			"..#####..#.#########\n" +
+			"####################\n" +
+			"#.####....###.#.#.##\n" +
+			"##.#################\n" +
+			"#####.##.###..####..\n" +
+			"..######..##.#######\n" +
+			"####.##.####...##..#\n" +
+			".#####..#.######.###\n" +
+			"##...#.##########...\n" +
+			"#.##########.#######\n" +
+			".####.#.###.###.#.##\n" +
+			"....##.##.###..#####\n" +
+			".#.#.###########.###\n" +
+			"#.#.#.#####.####.###\n" +
+			"###.##.####.##.#..##").vaporize200(11, 13);
+	}
+
+	@Test
+	public void degrees() throws Exception {
+		assertEquals(45.0, Day10.getDegrees(0, 0, 1, -1), 0.0);
+		assertEquals(135.0, Day10.getDegrees(0, 0, 1, 1), 0.0);
+		assertEquals(225.0, Day10.getDegrees(0, 0, -1, 1), 0.0);
+		assertEquals(315.0, Day10.getDegrees(0, 0, -1, -1), 0.0);
 	}
 
 	@Test
 	public void actualPart2() throws Exception {
+		// 2626 is too low
 		System.out.println(new Day10(INPUT).vaporize200(28, 29));
 
 	}

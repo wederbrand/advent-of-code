@@ -1,6 +1,9 @@
 package se.wederbrand.advent_2019;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class Day10 {
 	HashMap<String, String> map = new HashMap<>();
@@ -55,7 +58,7 @@ public class Day10 {
 			}
 
 			double innerDistance = Math.hypot(Math.abs(targetX - innerX), Math.abs(targetY - innerY));
-			double innerAngel = Math.atan2(((double) targetY - innerY), ((double) targetX - innerX));
+			double innerAngel = getDegrees(targetX, targetY, innerX, innerY);
 
 			// go through them again
 			for (String outer : map.keySet()) {
@@ -66,7 +69,7 @@ public class Day10 {
 				int outerY = Integer.parseInt(outer.split(",")[1]);
 
 				double outerDistance = Math.hypot(Math.abs(targetX - outerX), Math.abs(targetY - outerY));
-				double outerAngel = Math.atan2(((double) targetY - outerY), ((double) targetX - outerX));
+				double outerAngel = getDegrees(targetX, targetY, outerX, outerY);
 
 				if (outerDistance > innerDistance && innerAngel == outerAngel) {
 					// erase the ones that can't be seen
@@ -78,6 +81,19 @@ public class Day10 {
 		return mapCopy;
 	}
 
+	public static double getDegrees(int startX, int startY, int endX, int endY) {
+		double rad = Math.atan2((endY - startY), (endX - startX));
+		double deg = rad * (180 / Math.PI);
+		deg += 90;
+		if (deg > 360) {
+			deg -=360;
+		}
+		if (deg < 0) {
+			deg += 360;
+		}
+		return deg;
+	}
+
 	private String getKey(int x, int y) {
 		return x + "," + y;
 	}
@@ -86,47 +102,38 @@ public class Day10 {
 		int removed = 0;
 		while (true) {
 			// start up
-			double angel = Math.atan2(-1.0, 0.0);
+			double angel = getDegrees(0, 0, 0, -1);
 			// find all visible
 			HashMap<String, String> visibleMap = getVisibleMap(x, y);
+			SortedSet<String> sortedMap = new TreeSet<>(new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {
+					int targetX1 = Integer.parseInt(o1.split(",")[0]);
+					int targetY1 = Integer.parseInt(o1.split(",")[1]);
+					double degrees1 = getDegrees(x, y, targetX1, targetY1);
 
-			do {
-				// jump to the next possible
-				double[] nextTarget = findNextTarget(x, y, angel, visibleMap);
-				// remove it
-				int targetX = (int) nextTarget[0];
-				int targetY = (int) nextTarget[1];
-				double nextAngel = nextTarget[2];
-				visibleMap.remove(getKey(targetX, targetY));
-				map.remove(getKey(targetX, targetY));
+					int targetX2 = Integer.parseInt(o2.split(",")[0]);
+					int targetY2 = Integer.parseInt(o2.split(",")[1]);
+					double degrees2 = getDegrees(x, y, targetX2, targetY2);
+
+					return Double.compare(degrees1, degrees2);
+				}
+			});
+
+			sortedMap.addAll(visibleMap.keySet());
+
+			for (String key : sortedMap) {
+				map.remove(key);
 				removed++;
 				if (removed == 200) {
-					return targetX*100 + targetY;
+					String[] split = key.split(",");
+					int resultX = Integer.parseInt(split[0]);
+					int resultY = Integer.parseInt(split[1]);
+
+					return resultX*100+resultY;
 				}
-				angel = nextAngel;
-			} while (angel < Math.atan2(-1.0, 0.0));
-		}
-	}
-
-	private double[] findNextTarget(int targetX, int targetY, double targetAngel, HashMap<String, String> visibleMap) {
-		double minAngelDiff = Double.MAX_VALUE;
-		int nextTargetX = 0;
-		int nextTargetY = 0;
-		double nextAngel = 0.0;
-
-		for (String key : visibleMap.keySet()) {
-			int x = Integer.parseInt(key.split(",")[0]);
-			int y = Integer.parseInt(key.split(",")[1]);
-			double angel = Math.atan2(((double) targetY - y), ((double) targetX - x));
-
-			if (angel-targetAngel < minAngelDiff) {
-				minAngelDiff = angel-targetAngel;
-				nextTargetX = x;
-				nextTargetY = y;
-				nextAngel = angel;
 			}
 		}
-
-		return new double[]{nextTargetX, nextTargetY, nextAngel};
 	}
+
 }
