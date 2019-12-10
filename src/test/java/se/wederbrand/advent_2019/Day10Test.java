@@ -104,6 +104,7 @@ public class Day10Test {
 
 	@Test
 	public void actualPart2() throws Exception {
+		System.out.println(new Day10(INPUT).vaporize200(28, 29));
 
 	}
 }
