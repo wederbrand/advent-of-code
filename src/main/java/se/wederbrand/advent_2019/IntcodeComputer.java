@@ -10,6 +10,7 @@ public class IntcodeComputer implements Runnable {
 	int relativeBase = 0;
 	private BlockingQueue<Long> inputQueue;
 	private BlockingQueue<Long> outputQueue;
+	private boolean running;
 
 	public IntcodeComputer(String name, String code, BlockingQueue<Long> inputQueue, BlockingQueue<Long> outputQueue) {
 		this.name = name;
@@ -24,11 +25,13 @@ public class IntcodeComputer implements Runnable {
 
 	@Override
 	public void run() {
+		running = true;
 		int i = 0;
 		while (true) {
 			Long value = memory.get(i);
 			int opCode = (int) (value % 100);
 			if (opCode == 99) {
+				running = false;
 				return;
 			}
 
@@ -152,5 +155,9 @@ public class IntcodeComputer implements Runnable {
 
 	public void setMemory(int position, long value) {
 		memory.put(position, value);
+	}
+
+	public boolean isRunning() {
+		return running;
 	}
 }
