@@ -30,6 +30,7 @@ public class Day12Test {
 
 	@Test
 	public void actualPart2() throws Exception {
+		System.out.println(new Day12(INPUT).part2());
 	}
 
 
