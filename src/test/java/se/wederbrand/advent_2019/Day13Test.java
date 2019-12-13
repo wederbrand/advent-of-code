@@ -14,7 +14,7 @@ public class Day13Test {
 
 	@Test
 	public void actualPart1() throws Exception {
-		System.out.println(new Day13(INPUT).numberOf(2));
+		System.out.println(Day13.part1(INPUT));
 	}
 
 	@Test
@@ -23,6 +23,7 @@ public class Day13Test {
 
 	@Test
 	public void actualPart2() throws Exception {
+		System.out.println(Day13.part2(INPUT));
 	}
 
 
