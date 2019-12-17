@@ -5,29 +5,32 @@ import java.util.LinkedList;
 public class Day16 {
 
 	public static String part1(String input, int iterations) {
+		char[] chars = input.toCharArray();
+
 		for (int i = 1; i <= iterations; i++) {
-			input = phase(input);
+			System.out.println("iteration: " + i);
+			chars = phase(chars);
 		}
 
-		return input.substring(0, 8);
+		return new String(chars).substring(0, 8);
 	}
 
-	private static String phase(String input) {
-		String output = "";
-		for (int i = 0; i < input.length(); i++) {
-			output += getOne(input, i+1);
+	private static char[] phase(char[] chars) {
+		char[] output = new char[chars.length];
+		for (int i = 0; i < chars.length; i++) {
+			output[i] = getOne(chars, i+1);
 		}
 		return output;
 	}
 
-	private static String getOne(String input, int phaseOrder) {
+	private static char getOne(char[] input, int phaseOrder) {
 		LinkedList<Integer> basePattern = new LinkedList<>();
 		basePattern.add(0);
 		basePattern.add(1);
 		basePattern.add(0);
 		basePattern.add(-1);
 
-		int[] pattern = new int[input.length()+1];
+		int[] pattern = new int[input.length+1];
 		int i = 0;
 		while (i < pattern.length) {
 			Integer pop = basePattern.pop();
@@ -39,21 +42,20 @@ public class Day16 {
 		}
 
 		int result = 0;
-		String[] split = input.split("");
-		for (int i1 = 0; i1 < split.length; i1++) {
-			String number = split[i1];
-			int value = Integer.parseInt(number);
+		for (int i1 = 0; i1 < input.length; i1++) {
+			char c = input[i1];
+			int value = c - 48;
 			value *= pattern[i1+1];
 			result += value;
 		}
 
-		String s = String.valueOf(result);
-		return s.substring(s.length()-1);
+		return (char) ((Math.abs(result) % 10) + 48);
 	}
 
 	public static String part2(String input) {
 		String actualInput = "";
 		for (int i = 0; i < 10000; i++) {
+			System.out.println(i);
 			actualInput += input;
 		}
 
@@ -64,3 +66,4 @@ public class Day16 {
 		return output.substring(offset, offset+8);
 	}
 }
+
