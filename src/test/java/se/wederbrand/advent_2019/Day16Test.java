@@ -28,11 +28,14 @@ public class Day16Test {
 
 	@Test
 	public void testPart2() throws Exception {
+		assertEquals("84462026", Day16.part2("03036732577212944063491565474664", 10000));
+		assertEquals("78725270", Day16.part2("02935109699940807407585447034323", 10000));
+		assertEquals("53553731", Day16.part2("03081770884921959731165446850517", 10000));
 	}
 
 	@Test
 	public void actualPart2() throws Exception {
-		System.out.println(Day16.part2(INPUT));
+		System.out.println(Day16.part2(INPUT, 10000));
 	}
 
 

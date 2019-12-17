@@ -1,5 +1,6 @@
 package se.wederbrand.advent_2019;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class Day16 {
@@ -52,18 +53,31 @@ public class Day16 {
 		return (char) ((Math.abs(result) % 10) + 48);
 	}
 
-	public static String part2(String input) {
-		String actualInput = "";
-		for (int i = 0; i < 10000; i++) {
-			System.out.println(i);
-			actualInput += input;
+	public static String part2(String input, int multiplier) {
+		char[] inputChars = input.toCharArray();
+		char[] actualInput = new char[input.length()* multiplier];
+		for (int i = 0; i < multiplier; i++) {
+			System.arraycopy(inputChars, 0, actualInput, i*input.length(), input.length());
 		}
 
-		String output = part1(actualInput, 100);
 		String offsetString = input.substring(0, 7);
 		int offset = Integer.parseInt(offsetString);
+		char[] actualInputTruncated = Arrays.copyOfRange(actualInput, offset, actualInput.length);
 
-		return output.substring(offset, offset+8);
+		int[] result = new int[actualInputTruncated.length];
+		for (int i = actualInputTruncated.length-1; i >= 0; i--) {
+			char c = actualInputTruncated[i];
+			int value = c - 48;
+			result[result.length-1] = (result[result.length-1] + value) % 10;
+		}
+
+		for (int i = actualInputTruncated.length-2; i >= 0; i--) {
+			char c = actualInputTruncated[i];
+			int value = c - 48;
+			result[i] = (result[i+1] - value + 10) % 10;
+		}
+
+		return new String(Arrays.copyOfRange(actualInput, 0, 8));
 	}
 }
 
