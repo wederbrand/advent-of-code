@@ -14,7 +14,9 @@ public class Day17Test {
 
 	@Test
 	public void actualPart1() throws Exception {
-		System.out.println(new Day17(INPUT).part1());
+		// 3424 too high
+		// 3292 correct
+		System.out.println(new Day17(INPUT, false).part1());
 	}
 
 	@Test
@@ -23,5 +25,14 @@ public class Day17Test {
 
 	@Test
 	public void actualPart2() throws Exception {
+		// A B A C A B C B C A
+		// A: L12 R4 R4 L6
+		// B: L12 R4 R4 R12
+		// C: L10 L6 R4
+
+		System.out.println(new Day17(INPUT, true).part2("A,B,A,C,A,B,C,B,C,A", "L,6,6,R,4,R,4,L,6", "L,6,6,R,4,R,4,R,6,6", "L,5,5,L,6,R,4"));
+
+		// L12 R4 R4 L6 L12 R4 R4 R12 L12 R4 R4 L6 L10 L6 R4 L12 R4 R4 L6 L12 R4 R4 R12 L10 L6 R4 L12 R4 R4 R12 L10 L6 R4 L12 R4 R4 L6
+		// L12 R4 R4 L6 L12 R4 R4 R12 L12 R4 R4 L6 L10 L6 R4 L12 R4 R4 L6 L12 R4 R4 R12 L10 L6 R4 L12 R4 R4 R12 L10 L6 R4 L12 R4 R4 L6
 	}
 }
