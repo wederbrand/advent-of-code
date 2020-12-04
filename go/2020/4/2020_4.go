@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -22,6 +21,10 @@ type passport struct {
 }
 
 func (p passport) valid() bool {
+	return p.byrValid() && p.iyrValid() && p.eyrValid() && p.hgtValid() && p.hclValid() && p.eclValid() && p.pidValid()
+}
+
+func (p passport) byrValid() bool {
 	if p.byr == "" {
 		return false
 	}
@@ -33,10 +36,13 @@ func (p passport) valid() bool {
 		return false
 	}
 
+	return true
+}
+func (p passport) iyrValid() bool {
 	if p.iyr == "" {
 		return false
 	}
-	atoi, err = strconv.Atoi(p.iyr)
+	atoi, err := strconv.Atoi(p.iyr)
 	if err != nil {
 		return false
 	}
@@ -44,10 +50,14 @@ func (p passport) valid() bool {
 		return false
 	}
 
+	return true
+}
+
+func (p passport) eyrValid() bool {
 	if p.eyr == "" {
 		return false
 	}
-	atoi, err = strconv.Atoi(p.eyr)
+	atoi, err := strconv.Atoi(p.eyr)
 	if err != nil {
 		return false
 	}
@@ -55,6 +65,10 @@ func (p passport) valid() bool {
 		return false
 	}
 
+	return true
+}
+
+func (p passport) hgtValid() bool {
 	if p.hgt == "" {
 		return false
 	}
@@ -63,27 +77,27 @@ func (p passport) valid() bool {
 		return false
 	}
 	submatch := compile.FindStringSubmatch(p.hgt)
-	atoi, err = strconv.Atoi(submatch[1])
+	atoi, err := strconv.Atoi(submatch[1])
 	if err != nil {
 		return false
 	}
 	switch submatch[2] {
 	case "cm":
-		{
-			if atoi < 150 || atoi > 193 {
-				return false
-			}
+		if atoi < 150 || atoi > 193 {
+			return false
 		}
 	case "in":
-		{
-			if atoi < 59 || atoi > 76 {
-				return false
-			}
+		if atoi < 59 || atoi > 76 {
+			return false
 		}
 	default:
 		return false
 	}
 
+	return true
+}
+
+func (p passport) hclValid() bool {
 	if p.hcl == "" {
 		return false
 	}
@@ -92,6 +106,10 @@ func (p passport) valid() bool {
 		return false
 	}
 
+	return true
+}
+
+func (p passport) eclValid() bool {
 	if p.ecl == "" {
 		return false
 	}
@@ -100,6 +118,10 @@ func (p passport) valid() bool {
 		return false
 	}
 
+	return true
+}
+
+func (p passport) pidValid() bool {
 	if p.pid == "" {
 		return false
 	}
@@ -113,57 +135,48 @@ func (p passport) valid() bool {
 }
 
 func main() {
-	file, err := os.Open("input.txt")
+	readFile, err := ioutil.ReadFile("4/input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
 
 	passports := make([]*passport, 0)
-	scanner := bufio.NewScanner(file)
 
-	current := new(passport)
-	for scanner.Scan() {
-		text := scanner.Text()
-		if text == "" {
-			passports = append(passports, current)
-			current = new(passport)
-			continue
-		}
-		for _, s := range strings.Split(text, " ") {
-			pair := strings.Split(s, ":")
+	allPassports := strings.Split(strings.TrimSpace(string(readFile)), "\n\n")
+	for _, onePassport := range allPassports {
+		replace := strings.Replace(onePassport, "\n", " ", -1)
+		theFields := strings.Split(replace, " ")
+		passport := new(passport)
+		for _, oneField := range theFields {
+			pair := strings.Split(oneField, ":")
 			switch pair[0] {
 			case "byr":
-				current.byr = pair[1]
+				passport.byr = pair[1]
 			case "iyr":
-				current.iyr = pair[1]
+				passport.iyr = pair[1]
 			case "eyr":
-				current.eyr = pair[1]
+				passport.eyr = pair[1]
 			case "hgt":
-				current.hgt = pair[1]
+				passport.hgt = pair[1]
 			case "hcl":
-				current.hcl = pair[1]
+				passport.hcl = pair[1]
 			case "ecl":
-				current.ecl = pair[1]
+				passport.ecl = pair[1]
 			case "pid":
-				current.pid = pair[1]
+				passport.pid = pair[1]
 			case "cid":
-				current.cid = pair[1]
+				passport.cid = pair[1]
 			}
 		}
+		passports = append(passports, passport)
 	}
-	passports = append(passports, current)
 
 	count := 0
 	for _, p := range passports {
 		if p.valid() {
 			count++
-			fmt.Println(p.pid)
 		}
 	}
 
 	fmt.Println(count)
-
-	// 225 too high
-
 }
