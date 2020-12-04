@@ -26,7 +26,7 @@ func main() {
 
 	for i := 0; i < len(input)-2; i++ {
 		for j := i + 1; j < len(input)-1; j++ {
-			for k := j+1; k < len(input); k++ {
+			for k := j + 1; k < len(input); k++ {
 				if input[i]+input[j]+input[k] == 2020 {
 					fmt.Println(input[i] * input[j] * input[k])
 					os.Exit(0)
