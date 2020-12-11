@@ -15,18 +15,7 @@ func main() {
 
 	seats := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
-	//// add floor around the outer edges
-	//seats := make([]string, 0)
-	//seats = append(seats, "...")
-	//for _, s := range input {
-	//	row := "." + s + "."
-	//	seats = append(seats, row)
-	//}
-	//seats = append(seats, "...")
-
-	steps := 0
 	for {
-		steps++
 		newSeats, changes := stepOne(seats)
 		seats = newSeats
 		if changes == 0 {
@@ -39,7 +28,6 @@ func main() {
 		taken += strings.Count(seat, "#")
 	}
 
-	// 125 is too low
 	fmt.Println(taken)
 }
 
@@ -61,7 +49,7 @@ func stepOne(seats []string) ([]string, int) {
 					newSeats[y] += "L"
 				}
 			case '#':
-				if surrounding >= 4 {
+				if surrounding >= 5 {
 					newSeats[y] += "L"
 					diff++
 				} else {
@@ -76,28 +64,35 @@ func stepOne(seats []string) ([]string, int) {
 
 func countOccupied(seats []string, y int, x int) int {
 	count := 0
-	for i := y - 1; i <= y+1; i++ {
-		if i < 0 {
-			continue
-		}
-		if i == len(seats) {
-			continue
-		}
-		for j := x - 1; j <= x+1; j++ {
-			if j < 0 {
-				continue
-			}
-			if j == len(seats[i]) {
-				continue
-			}
-			if i == y && j == x {
-				continue
-			}
-			if seats[i][j] == '#' {
-				count++
-			}
-		}
-	}
+	count += countLine(seats, y, x, -1, 0)  // N
+	count += countLine(seats, y, x, -1, 1)  // NE
+	count += countLine(seats, y, x, 0, 1)   // E
+	count += countLine(seats, y, x, +1, 1)  // SE
+	count += countLine(seats, y, x, +1, 0)  // S
+	count += countLine(seats, y, x, +1, -1) // SW
+	count += countLine(seats, y, x, 0, -1)  // W
+	count += countLine(seats, y, x, -1, -1) // NW
 
 	return count
+}
+
+func countLine(seats []string, y int, x int, dy int, dx int) int {
+	for {
+		y += dy
+		x += dx
+		if y < 0 || x < 0 {
+			return 0
+		}
+		if y == len(seats) || x == len(seats[y]) {
+			return 0
+		}
+
+		if seats[y][x] == 'L' {
+			return 0
+		}
+
+		if seats[y][x] == '#' {
+			return 1
+		}
+	}
 }
