@@ -36,6 +36,18 @@ func solveOne(input string) int {
 		})
 	}
 
+	pFinder = regexp.MustCompile("(\\d+) \\+ (\\d+)")
+	for pFinder.MatchString(input) {
+		input = pFinder.ReplaceAllStringFunc(input, func(s string) string {
+			allString := pFinder.FindStringSubmatch(s)
+			v1, _ := strconv.Atoi(allString[1])
+			v2, _ := strconv.Atoi(allString[2])
+			value := v1 + v2
+			itoa := strconv.Itoa(value)
+			return itoa
+		})
+	}
+
 	split := strings.Split(input, " ")
 	nextIsAddition := true
 	for _, s := range split {
@@ -44,7 +56,6 @@ func solveOne(input string) int {
 		} else if s == "*" {
 			nextIsAddition = false
 		} else {
-			// number
 			atoi, _ := strconv.Atoi(s)
 			if nextIsAddition {
 				result += atoi
