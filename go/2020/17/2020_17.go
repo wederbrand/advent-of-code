@@ -7,6 +7,16 @@ import (
 	"strings"
 )
 
+type pos struct {
+	x int
+	y int
+	z int
+	w int
+}
+
+var offset = 7
+var size = 20
+
 func main() {
 	readFile, err := ioutil.ReadFile("17/input.txt")
 	if err != nil {
@@ -15,13 +25,12 @@ func main() {
 
 	input := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
-	offset := 7
-	var world [20][20][20][20]bool
+	world := make(map[pos]bool)
 
 	for y, s := range input {
 		for x, r := range s {
 			if r == '#' {
-				world[x+offset][y+offset][offset][offset] = true
+				world[pos{x + offset, y + offset, 0 + offset, 0 + offset}] = true
 			}
 		}
 	}
@@ -31,11 +40,11 @@ func main() {
 	}
 
 	cnt := 0
-	for x := 0; x < len(world); x++ {
-		for y := 0; y < len(world); y++ {
-			for z := 0; z < len(world); z++ {
-				for w := 0; w < len(world); w++ {
-					if world[x][y][z][w] {
+	for x := 0; x < size; x++ {
+		for y := 0; y < size; y++ {
+			for z := 0; z < size; z++ {
+				for w := 0; w < size; w++ {
+					if world[pos{x, y, z, w}] {
 						cnt++
 					}
 				}
@@ -46,36 +55,23 @@ func main() {
 	fmt.Println(cnt)
 }
 
-func printWorld(world [20][20][20][20]bool) {
-	for x := 0; x < len(world); x++ {
-		for y := 0; y < len(world); y++ {
-			for z := 0; z < len(world); z++ {
-				for w := 0; w < len(world); w++ {
-					if world[x][y][z][w] {
-						fmt.Println(x, y, z, w)
-					}
-				}
-			}
-		}
-	}
-}
-
-func expand(world [20][20][20][20]bool) [20][20][20][20]bool {
-	var newWorld [20][20][20][20]bool
-	for w := 0; w < len(newWorld); w++ {
-		for z := 0; z < len(newWorld); z++ {
-			for y := 0; y < len(newWorld); y++ {
-				for x := 0; x < len(newWorld); x++ {
-					cnt := count(world, x, y, z, w)
-					if world[x][y][z][w] {
+func expand(world map[pos]bool) map[pos]bool {
+	newWorld := make(map[pos]bool)
+	for w := 0; w < size; w++ {
+		for z := 0; z < size; z++ {
+			for y := 0; y < size; y++ {
+				for x := 0; x < size; x++ {
+					p := pos{x, y, z, w}
+					cnt := count(world, p)
+					if world[p] {
 						// rules for when it's active
 						if cnt == 2 || cnt == 3 {
-							newWorld[x][y][z][w] = true
+							newWorld[p] = true
 						}
 					} else {
 						// rules for when it's inactive
 						if cnt == 3 {
-							newWorld[x][y][z][w] = true
+							newWorld[p] = true
 						}
 					}
 				}
@@ -85,28 +81,16 @@ func expand(world [20][20][20][20]bool) [20][20][20][20]bool {
 	return newWorld
 }
 
-func count(world [20][20][20][20]bool, x int, y int, z int, w int) int {
+func count(world map[pos]bool, p pos) int {
 	cnt := 0
-	for xx := x - 1; xx <= x+1; xx++ {
-		if xx < 0 || xx >= len(world) {
-			continue
-		}
-		for yy := y - 1; yy <= y+1; yy++ {
-			if yy < 0 || yy >= len(world) {
-				continue
-			}
-			for zz := z - 1; zz <= z+1; zz++ {
-				if zz < 0 || zz >= len(world) {
-					continue
-				}
-				for ww := w - 1; ww <= w+1; ww++ {
-					if ww < 0 || ww >= len(world) {
+	for x := p.x - 1; x <= p.x+1; x++ {
+		for y := p.y - 1; y <= p.y+1; y++ {
+			for z := p.z - 1; z <= p.z+1; z++ {
+				for w := p.w - 1; w <= p.w+1; w++ {
+					if x == p.x && y == p.y && z == p.z && w == p.w {
 						continue
 					}
-					if xx == x && yy == y && zz == z && ww == w {
-						continue
-					}
-					if world[xx][yy][zz][ww] {
+					if world[pos{x, y, z, w}] {
 						cnt++
 					}
 				}
