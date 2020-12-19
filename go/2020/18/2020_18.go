@@ -27,6 +27,7 @@ func main() {
 func solveOne(input string) int {
 	result := 0
 
+	// recursively replace all expressions in parentheses with their calculated value
 	pFinder := regexp.MustCompile("\\(([0-9 +*])+\\)")
 	for pFinder.MatchString(input) {
 		input = pFinder.ReplaceAllStringFunc(input, func(s string) string {
@@ -36,6 +37,7 @@ func solveOne(input string) int {
 		})
 	}
 
+	// recursively replace all expressions surrounding + with their calculated value
 	pFinder = regexp.MustCompile("(\\d+) \\+ (\\d+)")
 	for pFinder.MatchString(input) {
 		input = pFinder.ReplaceAllStringFunc(input, func(s string) string {
@@ -48,6 +50,7 @@ func solveOne(input string) int {
 		})
 	}
 
+	// all remaining is * but the logic is unchanged from part 1
 	split := strings.Split(input, " ")
 	nextIsAddition := true
 	for _, s := range split {
