@@ -72,9 +72,65 @@ func (t tile) getSide(side int, reverse bool) string {
 	return result
 }
 
-func (t tile) getMapPart(dir1 int, dir2 int, offset int, lineIndex int) string {
+func (t tile) getMapPart(right int, flip bool, i int) string {
+	result := ""
 	// return the 8 characters with this dir1/dir2 and offset, and index (1 -> 8)
-	return ""
+	switch right {
+	case 0:
+		if flip {
+			for y := 1; y < size-1; y++ {
+				if t.dot[pos{i + 1, size - 1 - y}] {
+					result += "#"
+				} else {
+					result += "."
+				}
+			}
+		} else {
+			for y := 1; y < size-1; y++ {
+				if t.dot[pos{i + 1, size - 1 - y}] {
+					result += "#"
+				} else {
+					result += "."
+				}
+			}
+		}
+	case 1:
+		if flip {
+			for x := 1; x < size-1; x++ {
+				if t.dot[pos{x, i + 1}] {
+					result += "#"
+				} else {
+					result += "."
+				}
+			}
+		} else {
+			for x := 1; x < size-1; x++ {
+				if t.dot[pos{x, i + 1}] {
+					result += "#"
+				} else {
+					result += "."
+				}
+			}
+		}
+	case 2:
+		for y := 1; y < size-1; y++ {
+			if t.dot[pos{i + 1, y}] {
+				result += "#"
+			} else {
+				result += "."
+			}
+		}
+	case 3:
+		for x := 1; x < size-1; x++ {
+			if t.dot[pos{size - 1 - x, i + 1}] {
+				result += "#"
+			} else {
+				result += "."
+			}
+		}
+	}
+
+	return result
 }
 
 func newTile(input string) *tile {
@@ -146,8 +202,12 @@ func main() {
 	middleRE := regexp.MustCompile("^(.*)#....##....##....###(.*)$")
 	for _, corner := range corners {
 		for i := 0; i < 2; i++ {
-			fmt.Println("map for corner: ", corner.id, "flip: ", i == 0)
+			fmt.Println("map for corner: ", corner.id, "flip: ", i == 1)
 			giantMap := makeGiantMap(corner, i == 1)
+			for _, s := range giantMap {
+				fmt.Println(s)
+			}
+
 			for i := 1; i < len(giantMap)-2; i++ {
 				s := giantMap[i]
 				// look for the middle line
@@ -168,7 +228,7 @@ func main() {
 // should return 1 map, starting with this tile,
 // in either it's first or second direction
 func makeGiantMap(corner *tile, flip bool) []string {
-	// result := make([]string, 0)
+	result := make([]string, 0)
 	dir1 := -1
 	dir2 := -1
 
@@ -183,7 +243,6 @@ func makeGiantMap(corner *tile, flip bool) []string {
 	}
 
 	// calc what direction is RIGHT and what is DOWN. Note the flipping part.
-
 	right := dir1
 	down := dir2
 
@@ -196,20 +255,21 @@ func makeGiantMap(corner *tile, flip bool) []string {
 
 	// call something recursive with tile and right direction.
 	// then, go down, find tile underneath, turn it and call the recursive part with that one, and it's right direction!
-	someThingRecursive(corner, right, flip)
+	result = append(result, someThingRecursive(corner, right, flip, make([]string, 8))...)
 
-	return nil
+	return result
 }
 
-func someThingRecursive(t *tile, right int, flip bool) {
-	fmt.Println(t.id, "|", flip)
-	// todo: collect the lines for this tile
-	// t.getMapPart(dir1, dir2, flip, 1) // 1 -> 8
-	// then move on
+// should return all lines for this tile and to the right
+func someThingRecursive(t *tile, right int, flip bool, partial []string) []string {
+	for i := range partial {
+		partial[i] += t.getMapPart(right, flip, i)
+	}
+
 	nextTile := t.sides[right]
 	if nextTile == nil {
 		// we're done
-		// TODO: return what we've got
+		return partial
 	} else {
 		var nextTileRight int
 		for i, side := range nextTile.sides {
@@ -217,12 +277,13 @@ func someThingRecursive(t *tile, right int, flip bool) {
 				nextTileRight = (i + 2) % 4
 			}
 		}
-		if flip && !t.flippedSides[right] {
+
+		if t.flippedSides[right] && flip {
 			flip = !flip
-		} else if !flip && t.flippedSides[right] {
+		} else if !t.flippedSides[right] && flip {
 			flip = !flip
 		}
-		someThingRecursive(nextTile, nextTileRight, flip)
+		return someThingRecursive(nextTile, nextTileRight, flip, partial)
 	}
 }
 
