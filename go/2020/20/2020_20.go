@@ -17,9 +17,9 @@ type pos struct {
 }
 
 type tile struct {
-	id    int
-	dot   map[pos]bool
-	sides [4]*tile // 0 up, 1 right, 2 down, 3 left
+	id           int
+	dot          map[pos]bool
+	sides        [4]*tile // 0 up, 1 right, 2 down, 3 left
 	flippedSides [4]bool
 }
 
@@ -146,7 +146,8 @@ func main() {
 	middleRE := regexp.MustCompile("^(.*)#....##....##....###(.*)$")
 	for _, corner := range corners {
 		for i := 0; i < 2; i++ {
-			giantMap := makeGiantMap(corner, i==1)
+			fmt.Println("map for corner: ", corner.id, "flip: ", i == 0)
+			giantMap := makeGiantMap(corner, i == 1)
 			for i := 1; i < len(giantMap)-2; i++ {
 				s := giantMap[i]
 				// look for the middle line
@@ -173,7 +174,7 @@ func makeGiantMap(corner *tile, flip bool) []string {
 
 	for dir := 0; dir < 3; dir++ {
 		nextDir := dir + 1
-		if corner.sides[dir] != nil && corner.sides[nextDir % 4] != nil {
+		if corner.sides[dir] != nil && corner.sides[nextDir%4] != nil {
 			// found the two sides
 			dir1 = dir
 			dir2 = nextDir
@@ -195,12 +196,13 @@ func makeGiantMap(corner *tile, flip bool) []string {
 
 	// call something recursive with tile and right direction.
 	// then, go down, find tile underneath, turn it and call the recursive part with that one, and it's right direction!
-    someThingRecursive(corner, right, flip)
+	someThingRecursive(corner, right, flip)
 
 	return nil
 }
 
 func someThingRecursive(t *tile, right int, flip bool) {
+	fmt.Println(t.id, "|", flip)
 	// todo: collect the lines for this tile
 	// t.getMapPart(dir1, dir2, flip, 1) // 1 -> 8
 	// then move on
@@ -209,8 +211,17 @@ func someThingRecursive(t *tile, right int, flip bool) {
 		// we're done
 		// TODO: return what we've got
 	} else {
-		nextTileRight := (right + 4) % 4
-		if nextTile.sides[]
+		var nextTileRight int
+		for i, side := range nextTile.sides {
+			if side == t {
+				nextTileRight = (i + 2) % 4
+			}
+		}
+		if flip && !t.flippedSides[right] {
+			flip = !flip
+		} else if !flip && t.flippedSides[right] {
+			flip = !flip
+		}
 		someThingRecursive(nextTile, nextTileRight, flip)
 	}
 }
