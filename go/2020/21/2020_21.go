@@ -49,58 +49,73 @@ func main() {
 		f.al = strings.Split(strings.TrimSpace(split[1]), ", ")
 	}
 
-	// iterate over all foods forever
-RESTART:
-	for i := 0; i < len(allFood); i++ {
-		f1 := allFood[i]
-		for _, f2 := range allFood {
-			if f1 == f2 {
-				continue
+	allAl := make(map[string][]string)
+	for _, food := range allFood {
+		for _, allergen := range food.al {
+			if allAl[allergen] == nil {
+				// add all
+				allAl[allergen] = food.in
+			} else {
+				allAl[allergen] = union(allAl[allergen], food.in)
 			}
+		}
+	}
 
-			// two different food
-			// find exactly one allergen that is the same (two of the same will have to wait)
-			commonAllergen := findCommon(f1.al, f2.al)
-			commonIngredient := findCommon(f1.in, f2.in)
-
-			if commonAllergen != "" && commonIngredient != "" {
-				for _, f := range allFood {
-					f.removeIn(commonIngredient)
-					f.removeAl(commonAllergen)
+	// clear out each ingredient that is uniq from all the others, until none is removed
+OUTER:
+	for {
+		for al, in := range allAl {
+			if len(in) == 1 {
+				for innerAl := range allAl {
+					if al != innerAl {
+						minus := setMinus(allAl[innerAl], in[0])
+						if len(minus) != len(allAl[innerAl]) {
+							allAl[innerAl] = minus
+							continue OUTER
+						}
+					}
 				}
-				continue RESTART
 			}
 		}
+
+		// no changes, all done
+		break
 	}
 
-	// if we get this far we didn't star over and were done
-	allIn := make(map[string]bool)
-	for _, f := range allFood {
-		for _, s := range f.in {
-			allIn[s] = true
+	// clear out known allergens
+	for _, food := range allFood {
+		for _, ingredient := range allAl {
+			food.in = setMinus(food.in, ingredient[0])
 		}
 	}
 
-	// 200 is too low
-	fmt.Println(len(allIn))
+	cnt := 0
+	for _, f := range allFood {
+		cnt += len(f.in)
+	}
+
+	fmt.Println(cnt)
 }
 
-func findCommon(f1 []string, f2 []string) string {
-	result := ""
-	count := 0
-	for _, s1 := range f1 {
-		for _, s2 := range f2 {
-			if s1 == s2 {
-				count++
-				result = s1
-			}
+func setMinus(list []string, entryToRemove string) []string {
+	result := make([]string, 0)
+	for _, s := range list {
+		if s != entryToRemove {
+			result = append(result, s)
 		}
 	}
 
-	if count == 1 {
-		return result
-	} else {
-		return ""
-	}
+	return result
+}
 
+func union(a []string, b []string) []string {
+	result := make([]string, 0)
+	for _, s1 := range a {
+		for _, s2 := range b {
+			if s1 == s2 {
+				result = append(result, s1)
+			}
+		}
+	}
+	return result
 }
