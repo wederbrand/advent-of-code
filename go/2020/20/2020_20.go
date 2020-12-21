@@ -220,43 +220,72 @@ func main() {
 
 	// PART 2
 	// start on all the four corners, flipping each twice
-	aboveRE := regexp.MustCompile("^(.*)..................#.(.*)$")
-	middleRE := regexp.MustCompile("^(.*)#....##....##....###(.*)$")
-	belowRE := regexp.MustCompile("^(.*).#..#..#..#..#..#(.*)$")
 	for _, corner := range corners {
 		for i := 0; i < 2; i++ {
 
 			fmt.Println(corner.id, i == 1)
 			giantMap := makeGiantMap(corner, i == 1)
 			cnt := 0
-			found := 0
-			for i := 0; i < len(giantMap); i++ {
-				s := giantMap[i]
+			for _, s := range giantMap {
 				cnt += strings.Count(s, "#")
-				//fmt.Println(s)
-				// look for the middle line
-				if middleRE.MatchString(s) && i-1 > 0 && i+1 < len(giantMap) {
-					fmt.Println("line:", i)
-					for {
-						submatch := middleRE.FindStringSubmatch(s)
-						if submatch == nil {
-							break
-						}
-						s = submatch[2]
-						lineAbove := giantMap[i-1]
-						lineAboveRight := lineAbove[len(submatch[1]):]
-						lineAboveMiddle := lineAboveRight[:len(lineAboveRight)-len(submatch[2])]
-						lineBelow := giantMap[i+1]
-						lineBelowRight := lineBelow[len(submatch[1]):]
-						lineBelowMiddle := lineBelowRight[:len(lineBelowRight)-len(submatch[2])]
-						// if found, check the -1 and +1 once
-						if aboveRE.MatchString(lineAboveMiddle) && belowRE.MatchString(lineBelowMiddle) {
-							// found
-							found++
-						}
+			}
+			found := 0
+			for y := 0; y < len(giantMap)-2; y++ {
+				for x := 0; x < len(giantMap)-20; x++ {
+					// is there a monster with upper left corner x,y?
+					if giantMap[y][x+18] != '#' {
+						continue
 					}
+
+					if giantMap[y+1][x+0] != '#' {
+						continue
+					}
+					if giantMap[y+1][x+5] != '#' {
+						continue
+					}
+					if giantMap[y+1][x+6] != '#' {
+						continue
+					}
+					if giantMap[y+1][x+11] != '#' {
+						continue
+					}
+					if giantMap[y+1][x+12] != '#' {
+						continue
+					}
+					if giantMap[y+1][x+17] != '#' {
+						continue
+					}
+					if giantMap[y+1][x+18] != '#' {
+						continue
+					}
+					if giantMap[y+1][x+19] != '#' {
+						continue
+					}
+
+					if giantMap[y+2][x+1] != '#' {
+						continue
+					}
+					if giantMap[y+2][x+4] != '#' {
+						continue
+					}
+					if giantMap[y+2][x+7] != '#' {
+						continue
+					}
+					if giantMap[y+2][x+10] != '#' {
+						continue
+					}
+					if giantMap[y+2][x+13] != '#' {
+						continue
+					}
+					if giantMap[y+2][x+16] != '#' {
+						continue
+					}
+
+					// monster found!
+					found++
 				}
 			}
+
 			//fmt.Println(cnt)
 			if found > 0 {
 				// 1654 too low
