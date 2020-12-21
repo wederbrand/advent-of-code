@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -123,7 +124,7 @@ func (t tile) getMapPart(right int, flip bool, i int) string {
 			}
 		} else {
 			for y := 1; y < size-1; y++ {
-				if t.dot[pos{size - 1 + (i + 1), y}] {
+				if t.dot[pos{size - 1 - (i + 1), y}] {
 					result += "#"
 				} else {
 					result += "."
@@ -133,7 +134,7 @@ func (t tile) getMapPart(right int, flip bool, i int) string {
 	case 3:
 		if flip {
 			for x := 1; x < size-1; x++ {
-				if t.dot[pos{size - 1 - x, size - 1 - (i + 1)}] {
+				if t.dot[pos{size - 1 - x, i + 1}] {
 					result += "#"
 				} else {
 					result += "."
@@ -141,7 +142,7 @@ func (t tile) getMapPart(right int, flip bool, i int) string {
 			}
 		} else {
 			for x := 1; x < size-1; x++ {
-				if t.dot[pos{size - 1 - x, i + 1}] {
+				if t.dot[pos{size - 1 - x, size - 1 - (i + 1)}] {
 					result += "#"
 				} else {
 					result += "."
@@ -219,30 +220,52 @@ func main() {
 
 	// PART 2
 	// start on all the four corners, flipping each twice
+	aboveRE := regexp.MustCompile("^(.*)..................#.(.*)$")
 	middleRE := regexp.MustCompile("^(.*)#....##....##....###(.*)$")
+	belowRE := regexp.MustCompile("^(.*).#..#..#..#..#..#(.*)$")
 	for _, corner := range corners {
 		for i := 0; i < 2; i++ {
-			fmt.Println("map for corner: ", corner.id, "flip: ", i == 1)
-			giantMap := makeGiantMap(corner, i == 1)
-			for _, s := range giantMap {
-				fmt.Println(s)
-			}
 
-			for i := 1; i < len(giantMap)-2; i++ {
+			fmt.Println(corner.id, i == 1)
+			giantMap := makeGiantMap(corner, i == 1)
+			cnt := 0
+			found := 0
+			for i := 0; i < len(giantMap); i++ {
 				s := giantMap[i]
+				cnt += strings.Count(s, "#")
+				//fmt.Println(s)
 				// look for the middle line
-				if middleRE.MatchString(s) {
-					fmt.Println("found")
-					// if found, check the -1 and +1 once
-					// if found, replace all 3 with 0
-					// count #
-					// print
-					// exit
+				if middleRE.MatchString(s) && i-1 > 0 && i+1 < len(giantMap) {
+					fmt.Println("line:", i)
+					for {
+						submatch := middleRE.FindStringSubmatch(s)
+						if submatch == nil {
+							break
+						}
+						s = submatch[2]
+						lineAbove := giantMap[i-1]
+						lineAboveRight := lineAbove[len(submatch[1]):]
+						lineAboveMiddle := lineAboveRight[:len(lineAboveRight)-len(submatch[2])]
+						lineBelow := giantMap[i+1]
+						lineBelowRight := lineBelow[len(submatch[1]):]
+						lineBelowMiddle := lineBelowRight[:len(lineBelowRight)-len(submatch[2])]
+						// if found, check the -1 and +1 once
+						if aboveRE.MatchString(lineAboveMiddle) && belowRE.MatchString(lineBelowMiddle) {
+							// found
+							found++
+						}
+					}
 				}
+			}
+			//fmt.Println(cnt)
+			if found > 0 {
+				// 1654 too low
+				// 2351 too high
+				fmt.Println(cnt - found*15)
+				os.Exit(0)
 			}
 		}
 	}
-	fmt.Println("result")
 }
 
 // should return 1 map, starting with this tile,
@@ -273,17 +296,45 @@ func makeGiantMap(corner *tile, flip bool) []string {
 	right %= 4
 	down %= 4
 
+	result = downRecursive(corner, right, down, flip, result)
 	// call something recursive with tile and right direction.
 	// then, go down, find tile underneath, turn it and call the recursive part with that one, and it's right direction!
-	result = append(result, someThingRecursive(corner, right, flip, make([]string, 8))...)
 
 	return result
 }
 
+func downRecursive(t *tile, right int, down int, flip bool, result []string) []string {
+	result = append(result, rightRecursive(t, right, flip, make([]string, 8))...)
+	// when this returns I should find the next tile down, and redo
+
+	downTile := t.sides[down]
+	if downTile == nil {
+		return result
+	} else {
+		// find the correct orientation
+		myDown := t.getSide(down, flip)
+		for i := 0; i < 4; i++ {
+			for j := 0; j < 2; j++ {
+				thatSide := downTile.getSide(i, j == 0)
+				if myDown == thatSide {
+					nextRight := i + 1
+					if j == 1 {
+						nextRight += 2
+					}
+					nextRight %= 4
+					return downRecursive(downTile, nextRight, (i+2)%4, j == 1, result)
+				}
+			}
+		}
+
+		panic("at the disco")
+	}
+}
+
 // should return all lines for this tile and to the right
-func someThingRecursive(t *tile, right int, flip bool, partial []string) []string {
+func rightRecursive(t *tile, right int, flip bool, partial []string) []string {
 	for i := range partial {
-		partial[i] += " " + t.getMapPart(right, flip, i)
+		partial[i] += t.getMapPart(right, flip, i)
 	}
 
 	nextTile := t.sides[right]
@@ -297,7 +348,7 @@ func someThingRecursive(t *tile, right int, flip bool, partial []string) []strin
 			for j := 0; j < 2; j++ {
 				thatSide := nextTile.getSide(i, j == 0)
 				if mySide == thatSide {
-					return someThingRecursive(nextTile, (i+2)%4, j == 1, partial)
+					return rightRecursive(nextTile, (i+2)%4, j == 1, partial)
 				}
 			}
 		}
