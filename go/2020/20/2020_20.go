@@ -79,7 +79,7 @@ func (t tile) getMapPart(right int, flip bool, i int) string {
 	case 0:
 		if flip {
 			for y := 1; y < size-1; y++ {
-				if t.dot[pos{i + 1, size - 1 - y}] {
+				if t.dot[pos{size - 1 - (i + 1), size - 1 - y}] {
 					result += "#"
 				} else {
 					result += "."
@@ -97,7 +97,7 @@ func (t tile) getMapPart(right int, flip bool, i int) string {
 	case 1:
 		if flip {
 			for x := 1; x < size-1; x++ {
-				if t.dot[pos{x, i + 1}] {
+				if t.dot[pos{x, size - 1 - (i + 1)}] {
 					result += "#"
 				} else {
 					result += "."
@@ -113,19 +113,39 @@ func (t tile) getMapPart(right int, flip bool, i int) string {
 			}
 		}
 	case 2:
-		for y := 1; y < size-1; y++ {
-			if t.dot[pos{i + 1, y}] {
-				result += "#"
-			} else {
-				result += "."
+		if flip {
+			for y := 1; y < size-1; y++ {
+				if t.dot[pos{i + 1, y}] {
+					result += "#"
+				} else {
+					result += "."
+				}
+			}
+		} else {
+			for y := 1; y < size-1; y++ {
+				if t.dot[pos{size - 1 + (i + 1), y}] {
+					result += "#"
+				} else {
+					result += "."
+				}
 			}
 		}
 	case 3:
-		for x := 1; x < size-1; x++ {
-			if t.dot[pos{size - 1 - x, i + 1}] {
-				result += "#"
-			} else {
-				result += "."
+		if flip {
+			for x := 1; x < size-1; x++ {
+				if t.dot[pos{size - 1 - x, size - 1 - (i + 1)}] {
+					result += "#"
+				} else {
+					result += "."
+				}
+			}
+		} else {
+			for x := 1; x < size-1; x++ {
+				if t.dot[pos{size - 1 - x, i + 1}] {
+					result += "#"
+				} else {
+					result += "."
+				}
 			}
 		}
 	}
@@ -263,7 +283,7 @@ func makeGiantMap(corner *tile, flip bool) []string {
 // should return all lines for this tile and to the right
 func someThingRecursive(t *tile, right int, flip bool, partial []string) []string {
 	for i := range partial {
-		partial[i] += t.getMapPart(right, flip, i)
+		partial[i] += " " + t.getMapPart(right, flip, i)
 	}
 
 	nextTile := t.sides[right]
@@ -271,19 +291,18 @@ func someThingRecursive(t *tile, right int, flip bool, partial []string) []strin
 		// we're done
 		return partial
 	} else {
-		var nextTileRight int
-		for i, side := range nextTile.sides {
-			if side == t {
-				nextTileRight = (i + 2) % 4
+		// find the correct orientation
+		mySide := t.getSide(right, flip)
+		for i := 0; i < 4; i++ {
+			for j := 0; j < 2; j++ {
+				thatSide := nextTile.getSide(i, j == 0)
+				if mySide == thatSide {
+					return someThingRecursive(nextTile, (i+2)%4, j == 1, partial)
+				}
 			}
 		}
 
-		if t.flippedSides[right] && flip {
-			flip = !flip
-		} else if !t.flippedSides[right] && flip {
-			flip = !flip
-		}
-		return someThingRecursive(nextTile, nextTileRight, flip, partial)
+		panic("at the disco")
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -94,7 +95,22 @@ OUTER:
 		cnt += len(f.in)
 	}
 
-	fmt.Println(cnt)
+	fmt.Println("part 1:", cnt)
+
+	sortedAl := make([]string, 0)
+	for al := range allAl {
+		sortedAl = append(sortedAl, al)
+	}
+
+	sort.Strings(sortedAl)
+
+	result := ""
+	for _, al := range sortedAl {
+		result += allAl[al][0] + ","
+	}
+
+	result = strings.TrimRight(result, ",")
+	fmt.Println("part 2:", result)
 }
 
 func setMinus(list []string, entryToRemove string) []string {
