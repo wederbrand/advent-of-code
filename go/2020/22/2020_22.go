@@ -44,6 +44,16 @@ func (d deck) copy(count int) *deck {
 	return deck
 }
 
+func (d deck) getKey() string {
+	key := ""
+
+	for _, card := range d.cards {
+		key += strconv.Itoa(card) + " "
+	}
+
+	return key
+}
+
 func newDeck(s string) *deck {
 	deck := new(deck)
 	split := strings.Split(s, "\n")
@@ -77,13 +87,18 @@ func main() {
 }
 
 func playGame(p1 *deck, p2 *deck) *deck {
+	p1SeenDecks := make(map[string]bool)
+	p2SeenDecks := make(map[string]bool)
 	for {
-		// TODO: check all older games
-		// return p1
+		if p1SeenDecks[p1.getKey()] {
+			return p1
+		}
+		if p2SeenDecks[p2.getKey()] {
+			return p1
+		}
 
-		fmt.Println("p1", p1.cards)
-		fmt.Println("p2", p2.cards)
-		fmt.Println("")
+		p1SeenDecks[p1.getKey()] = true
+		p2SeenDecks[p2.getKey()] = true
 
 		if len(p1.cards) == 0 {
 			return p2
