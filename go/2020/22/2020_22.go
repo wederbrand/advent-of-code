@@ -35,6 +35,15 @@ func (d *deck) getScore() int {
 	return score
 }
 
+func (d deck) copy(count int) *deck {
+	deck := new(deck)
+	deck.name = d.name
+	for _, card := range d.cards[:count] {
+		deck.addToBottom(card)
+	}
+	return deck
+}
+
 func newDeck(s string) *deck {
 	deck := new(deck)
 	split := strings.Split(s, "\n")
@@ -69,6 +78,13 @@ func main() {
 
 func playGame(p1 *deck, p2 *deck) *deck {
 	for {
+		// TODO: check all older games
+		// return p1
+
+		fmt.Println("p1", p1.cards)
+		fmt.Println("p2", p2.cards)
+		fmt.Println("")
+
 		if len(p1.cards) == 0 {
 			return p2
 		}
@@ -78,7 +94,21 @@ func playGame(p1 *deck, p2 *deck) *deck {
 		c1 := p1.getTopCard()
 		c2 := p2.getTopCard()
 
-		if c1 > c2 {
+		var winner *deck
+		if c1 <= len(p1.cards) && c2 <= len(p2.cards) {
+			// subgame
+			p1sub := p1.copy(c1)
+			p2sub := p2.copy(c2)
+			winner = playGame(p1sub, p2sub)
+		} else {
+			if c1 > c2 {
+				winner = p1
+			} else {
+				winner = p2
+			}
+		}
+
+		if winner.name == p1.name {
 			p1.addToBottom(c1)
 			p1.addToBottom(c2)
 		} else {
