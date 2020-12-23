@@ -24,6 +24,7 @@ func main() {
 	current := prev
 	one := prev
 	max := 0
+	all := make(map[int]*cup)
 	for _, s := range input {
 		atoi, _ := strconv.Atoi(s)
 		if atoi > max {
@@ -31,6 +32,8 @@ func main() {
 		}
 		nextCup := new(cup)
 		nextCup.value = atoi
+		all[nextCup.value] = nextCup
+
 		prev.next = nextCup
 		prev = nextCup
 
@@ -39,23 +42,29 @@ func main() {
 		}
 	}
 
+	for i := 10; i <= 1_000_000; i++ {
+		if i > max {
+			max = i
+		}
+
+		nextCup := new(cup)
+		nextCup.value = i
+		all[nextCup.value] = nextCup
+		prev.next = nextCup
+		prev = nextCup
+	}
+
 	prev.next = current.next
 	current = current.next
 
-	for i := 0; i < 100; i++ {
-		current = rotate(current, max)
+	for i := 0; i < 10_000_005; i++ {
+		current = rotate(current, max, all)
 	}
 
-	result := ""
-	for i := 0; i < 8; i++ {
-		one = one.next
-		result += strconv.Itoa(one.value)
-	}
-
-	fmt.Println(result)
+	fmt.Println(one.next.value * one.next.next.value)
 }
 
-func rotate(current *cup, max int) *cup {
+func rotate(current *cup, max int, all map[int]*cup) *cup {
 	lift := current.next                       // don't care for how many it is, it's all
 	current.next = current.next.next.next.next // shortcut 3 of them
 
@@ -78,14 +87,7 @@ func rotate(current *cup, max int) *cup {
 	}
 
 	// insert the lifted ones
-	insertCup := current
-	for {
-		insertCup = insertCup.next
-		if insertCup.value == insertTarget {
-			break
-		}
-	}
-
+	insertCup := all[insertTarget]
 	insertCup.next, lift.next.next.next = lift, insertCup.next
 
 	return current.next
