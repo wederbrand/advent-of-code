@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type cup struct {
@@ -14,6 +15,7 @@ type cup struct {
 }
 
 func main() {
+	start := time.Now()
 	readFile, err := ioutil.ReadFile("23/input.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -62,6 +64,7 @@ func main() {
 	}
 
 	fmt.Println(one.next.value * one.next.next.value)
+	fmt.Println(time.Since(start))
 }
 
 func rotate(current *cup, max int, all map[int]*cup) *cup {
