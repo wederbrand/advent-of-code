@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strconv"
-	"strings"
 )
 
 func main() {
@@ -14,9 +12,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	input := strings.Split(strings.TrimSpace(string(readFile)), "\n")
-	cardPubKey, _ := strconv.Atoi(input[0])
-	doorPubKey, _ := strconv.Atoi(input[1])
+	var cardPubKey int
+	var doorPubKey int
+
+	fmt.Sscanf(string(readFile), "%d\n%d", &cardPubKey, &doorPubKey)
 
 	cardLoopSize := findLoop(cardPubKey)
 	doorLoopSize := findLoop(doorPubKey)
