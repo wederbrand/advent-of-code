@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Point struct {
@@ -23,26 +23,26 @@ type Line struct {
 	end   Point
 }
 
-func (l Line) feed(c chan Point) {
-	// feed all the points
+func (line Line) feedPoints(c chan Point) {
+	// feedPoints all the points
 
 	dx := 0
-	if l.start.x < l.end.x {
+	if line.start.x < line.end.x {
 		dx = 1
-	} else if l.start.x > l.end.x {
+	} else if line.start.x > line.end.x {
 		dx = -1
 	}
 	dy := 0
-	if l.start.y < l.end.y {
+	if line.start.y < line.end.y {
 		dy = 1
-	} else if l.start.y > l.end.y {
+	} else if line.start.y > line.end.y {
 		dy = -1
 	}
 
-	p := l.start
+	p := line.start
 	c <- p
 
-	for ok := true; ok; ok = p != l.end {
+	for ok := true; ok; ok = p != line.end {
 		p.x += dx
 		p.y += dy
 		c <- p
@@ -52,17 +52,16 @@ func (l Line) feed(c chan Point) {
 }
 
 func main() {
-	file, err := os.Open("2021/2021_5.txt")
+	readFile, err := os.ReadFile("2021/2021_5.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+
+	inFile := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
 	matcher := regexp.MustCompile("(\\d+),(\\d+) -> (\\d+),(\\d+)")
-	scanner := bufio.NewScanner(file)
 	input := make([]Line, 0)
-	for scanner.Scan() {
-		text := scanner.Text()
+	for _, text := range inFile {
 		submatch := matcher.FindStringSubmatch(text)
 		var l Line
 
@@ -77,11 +76,11 @@ func main() {
 
 	floor := make(map[string]int)
 
-	for _, l := range input {
+	for _, line := range input {
 		c := make(chan Point)
-		go l.feed(c)
-		for p := range c {
-			floor[p.key()]++
+		go line.feedPoints(c)
+		for point := range c {
+			floor[point.key()]++
 		}
 	}
 

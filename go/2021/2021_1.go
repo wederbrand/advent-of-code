@@ -1,26 +1,24 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func main() {
-	file, err := os.Open("2021/2021_1.txt")
+	readFile, err := os.ReadFile("2021/2021_1.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	inFile := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
 	input := make([]int, 0)
-	for scanner.Scan() {
-		sValue := scanner.Text()
-		iValue, _ := strconv.Atoi(sValue)
+	for _, text := range inFile {
+		iValue, _ := strconv.Atoi(text)
 		input = append(input, iValue)
 	}
 

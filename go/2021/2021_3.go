@@ -1,28 +1,22 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func main() {
-	file, err := os.Open("2021/2021_3.txt")
+	readFile, err := os.ReadFile("2021/2021_3.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	input := make([]string, 0)
-	for scanner.Scan() {
-		text := scanner.Text()
-		input = append(input, text)
-	}
+	inFile := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
-	current := input
+	current := inFile
 	index := 0
 	for len(current) > 1 {
 		count := count(current, '1', index)
@@ -36,7 +30,7 @@ func main() {
 
 	oxygen, _ := strconv.ParseInt(current[0], 2, 64)
 
-	current = input
+	current = inFile
 	index = 0
 	for len(current) > 1 {
 		count := count(current, '0', index)

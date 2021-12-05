@@ -1,29 +1,28 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 func main() {
-	file, err := os.Open("2021/2021_2.txt")
+	readFile, err := os.ReadFile("2021/2021_2.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+
+	inFile := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
 	matcher := regexp.MustCompile("(.+) (\\d+)")
-	scanner := bufio.NewScanner(file)
 
 	h := 0
 	d := 0
 	a := 0
-	for scanner.Scan() {
-		text := scanner.Text()
+	for _, text := range inFile {
 		submatch := matcher.FindStringSubmatch(text)
 		command := submatch[1]
 		value, _ := strconv.Atoi(submatch[2])

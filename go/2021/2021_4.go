@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -54,27 +53,22 @@ func (b *board) score(v int) int {
 }
 
 func main() {
-	file, err := os.Open("2021/2021_4.txt")
+	readFile, err := os.ReadFile("2021/2021_4.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+
+	inFile := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
 	re := regexp.MustCompile("\\d+")
-	scanner := bufio.NewScanner(file)
-	input := make([]string, 0)
-	for scanner.Scan() {
-		text := scanner.Text()
-		input = append(input, text)
-	}
 
-	numbers := input[0]
+	numbers := inFile[0]
 	boards := make([]*board, 0)
 
-	for i := 2; i < len(input); i += 6 {
+	for i := 2; i < len(inFile); i += 6 {
 		b := new(board)
 		for j := 0; j < 5; j++ {
-			split := re.FindAllString(input[i+j], -1)
+			split := re.FindAllString(inFile[i+j], -1)
 			for k := 0; k < 5; k++ {
 				v, _ := strconv.Atoi(split[k])
 				b.set(j, k, v)
