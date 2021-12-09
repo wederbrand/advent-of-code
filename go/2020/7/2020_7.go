@@ -19,7 +19,7 @@ func main() {
 	ruleMatcher := regexp.MustCompile("(.*) bags contain (.*)")
 	bagMatcher := regexp.MustCompile("(\\d+) (.+?) bag")
 
-	rules := make(map[string]map[string]int)
+	rules := make(map[string]Floor)
 	for _, rule := range rulesInput {
 		submatch := ruleMatcher.FindStringSubmatch(rule)
 		color := submatch[1]
