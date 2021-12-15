@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -30,10 +29,20 @@ func newQueue() *queue {
 
 func (q *queue) add(p *point) {
 	// add point to queue and sort it by total price
-	q.points = append(q.points, p)
-	sort.Slice(q.points, func(i, j int) bool {
-		return q.points[i].totalPrice < q.points[j].totalPrice
-	})
+	if len(q.points) == 0 {
+		q.points = append(q.points, p)
+	} else {
+		for i, p2 := range q.points {
+			if p.totalPrice < p2.totalPrice {
+				// insert here
+				q.points = append(q.points, nil)   // make room for copy
+				copy(q.points[i+1:], q.points[i:]) // make room at index i, overwriting the nil
+				q.points[i] = p                    // insert p
+				return
+			}
+		}
+		q.points = append(q.points, p)
+	}
 }
 
 func (q *queue) empty() bool {
