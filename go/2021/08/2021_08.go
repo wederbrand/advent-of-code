@@ -24,7 +24,7 @@ func sortString(value string) string {
 }
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_8.txt")
+	readFile, err := os.ReadFile("2021/08/2021_08.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

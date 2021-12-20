@@ -53,7 +53,7 @@ func (b *board) score(v int) int {
 }
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_4.txt")
+	readFile, err := os.ReadFile("2021/04/2021_04.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

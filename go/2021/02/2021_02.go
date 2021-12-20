@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_2.txt")
+	readFile, err := os.ReadFile("2021/02/2021_02.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

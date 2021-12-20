@@ -17,7 +17,7 @@ func Reverse(s string) string {
 }
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_10.txt")
+	readFile, err := os.ReadFile("2021/10/2021_10.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

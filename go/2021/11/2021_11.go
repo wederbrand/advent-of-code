@@ -16,7 +16,7 @@ type point struct {
 type key [2]int
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_11.txt")
+	readFile, err := os.ReadFile("2021/11/2021_11.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

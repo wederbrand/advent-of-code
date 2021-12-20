@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_6.txt")
+	readFile, err := os.ReadFile("2021/06/2021_06.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -41,7 +41,7 @@ func (f Floor) inBasin(x int, y int) bool {
 }
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_9.txt")
+	readFile, err := os.ReadFile("2021/09/2021_09.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

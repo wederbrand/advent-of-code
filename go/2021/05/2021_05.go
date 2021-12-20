@@ -52,7 +52,7 @@ func (line Line) feedPoints(c chan Point) {
 }
 
 func main() {
-	readFile, err := os.ReadFile("2021/2021_5.txt")
+	readFile, err := os.ReadFile("2021/05/2021_05.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
