@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	readFile, err := os.ReadFile("input.txt")
+	readFile, err := os.ReadFile("01/input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
