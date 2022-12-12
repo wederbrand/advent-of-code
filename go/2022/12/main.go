@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strings"
 	"time"
@@ -12,7 +11,8 @@ import (
 type point struct {
 	x, y   int
 	height int
-	end    bool
+	part1  bool
+	part2  bool
 }
 
 func (p point) key() string {
@@ -25,10 +25,13 @@ func newPoint(r rune, x int, y int) point {
 		y: y,
 	}
 	if r == 'S' {
+		p.part1 = true
 		r = 'a'
 	}
+	if r == 'a' {
+		p.part2 = true
+	}
 	if r == 'E' {
-		p.end = true
 		r = 'z'
 	}
 	p.height = int(r - 'a')
@@ -89,51 +92,42 @@ func main() {
 	inFile := strings.Split(strings.TrimSpace(string(readFile)), "\n")
 
 	world := make(map[string]point)
-	var part1 point
-	starts := make([]point, 0)
+	var summit point
 
 	for y, s := range inFile {
 		for x, r := range s {
 			p := newPoint(r, x, y)
-			if r == 'S' {
-				starts = append(starts, p)
-				part1 = p
-			}
-			if r == 'a' {
-				starts = append(starts, p)
+			if r == 'E' {
+				summit = p
 			}
 			world[p.key()] = p
 		}
 	}
 
-	fmt.Println("part 1:", getDistance(world, part1), "in", time.Since(start))
-
-	min := math.MaxInt
-	for _, start := range starts {
-		distance := getDistance(world, start)
-		if distance < min {
-			min = distance
-		}
-	}
-
-	fmt.Println("part 2:", min, "in", time.Since(start))
+	part1, part2 := getDistance(world, summit)
+	fmt.Println("part 1", part1)
+	fmt.Println("part 2", part2)
+	fmt.Println("time", time.Since(start))
 }
 
-func getDistance(world map[string]point, start point) int {
+func getDistance(world map[string]point, summit point) (part1 int, part2 int) {
 	q := newQueue()
 	visited := make(map[string]int)
 	currentState := state{
-		p:     start,
+		p:     summit,
 		price: 0,
 	}
 	q.add(&currentState)
-	visited[start.key()] = 0
+	visited[summit.key()] = 0
 
 	for len(q.states) > 0 {
 		s := q.dequeue()
-		// fmt.Println("testing", s, len(q.states))
-		if s.p.end {
-			return s.price
+		if s.p.part2 && part2 == 0 {
+			part2 = s.price
+		}
+		if s.p.part1 {
+			part1 = s.price
+			return
 		}
 
 		// move in all directions
@@ -148,11 +142,8 @@ func getDistance(world map[string]point, start point) int {
 				// can't go there
 				continue
 			}
-			if p2.key() != key(x, y) {
-				panic("weird")
-			}
 
-			if p2.height-s.p.height > 1 {
+			if s.p.height-p2.height > 1 {
 				// can't go there
 				continue
 			}
@@ -165,10 +156,8 @@ func getDistance(world map[string]point, start point) int {
 				}
 				q.add(&newState)
 				visited[newState.p.key()] = newState.price
-				//fmt.Println("queued", newState)
 			}
 		}
 	}
-
-	return math.MaxInt
+	return
 }
