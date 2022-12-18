@@ -2,13 +2,18 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"time"
 )
 
 type rock []uint8
 
 const rowsToCompare = 10
+
+type state struct {
+	rockIndex int
+	height    int
+	lastX     string
+}
 
 func main() {
 	start := time.Now()
@@ -64,11 +69,12 @@ func main() {
 	currentIndex := len(world) + 3 // bottom of current rock
 	rockIndex++
 
-	limit := 2022
-	//limit := 1000000000000
+	//limit := 2022
+	limit := 1000000000000
 
-	//stateLog := make([]state, 0)
+	stateLog := make(map[string]state)
 
+	freeHeight := 0 // we'll use this later
 	for rockIndex <= limit {
 		// blow
 		switch wind[windIndex%len(wind)] {
@@ -126,11 +132,43 @@ func main() {
 			current = clone(rocks[rockIndex%len(rocks)])
 			currentIndex = len(world) + 3
 			rockIndex++
+			key := fmt.Sprintf("%d:%d", rockIndex%len(rocks), windIndex%len(wind))
+			next := state{
+				rockIndex: rockIndex,
+				height:    len(world),
+				lastX:     hash(world),
+			}
+			prev, found := stateLog[key]
+			if found && prev.lastX == next.lastX {
+				heightDiff := next.height - prev.height
+				rockDiff := next.rockIndex - prev.rockIndex
+				nbrLeft := limit - next.rockIndex
+				freeIterations := nbrLeft / rockDiff
+
+				freeHeight = freeIterations * heightDiff
+				rockIndex += freeIterations * rockDiff
+				// clear cache to not catch again
+				stateLog = make(map[string]state)
+			} else {
+				stateLog[key] = next
+			}
 		}
 	}
 
-	fmt.Println("part1:", len(world)-1, "in", time.Since(start))
+	fmt.Println("part2:", len(world)-1+freeHeight, "in", time.Since(start))
 
+}
+
+func hash(world rock) string {
+	result := ""
+	for i := len(world) - rowsToCompare; i < len(world); i++ {
+		if i < 0 {
+			result += "."
+		} else {
+			result += string(world[i])
+		}
+	}
+	return result
 }
 
 func checkCollision(current rock, world rock, currentIndex int, dx int, dy int) bool {
@@ -152,18 +190,6 @@ func checkCollision(current rock, world rock, currentIndex int, dx int, dy int) 
 		}
 	}
 	return true
-}
-
-func printIt(world rock) {
-	fmt.Println()
-	for i := 0; i < len(world); i++ {
-		j := len(world) - i - 1
-		prnt := fmt.Sprintf("|%7b|\n", world[j])
-		prnt = strings.ReplaceAll(prnt, " ", ".")
-		prnt = strings.ReplaceAll(prnt, "0", ".")
-		prnt = strings.ReplaceAll(prnt, "1", "#")
-		fmt.Printf(prnt)
-	}
 }
 
 func clone(src rock) rock {
