@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -128,35 +129,51 @@ func main() {
 					world = append(world, current[tempIndex])
 				}
 			}
-			//printIt(world)
 			current = clone(rocks[rockIndex%len(rocks)])
+			//			fmt.Println("rock:", rockIndex, ", height:", len(world)-1)
+			//			printIt(world)
+
 			currentIndex = len(world) + 3
 			rockIndex++
-			key := fmt.Sprintf("%d:%d", rockIndex%len(rocks), windIndex%len(wind))
-			next := state{
-				rockIndex: rockIndex,
-				height:    len(world),
-				lastX:     hash(world),
-			}
-			prev, found := stateLog[key]
-			if found && prev.lastX == next.lastX {
-				heightDiff := next.height - prev.height
-				rockDiff := next.rockIndex - prev.rockIndex
-				nbrLeft := limit - next.rockIndex
-				freeIterations := nbrLeft / rockDiff
+			if rockIndex%len(rocks) == 0 {
+				key := fmt.Sprintf("%d:%d", rockIndex%len(rocks), windIndex%len(wind))
+				next := state{
+					rockIndex: rockIndex,
+					height:    len(world),
+					lastX:     hash(world),
+				}
+				prev, found := stateLog[key]
+				if found && prev.lastX == next.lastX {
+					heightDiff := next.height - prev.height
+					rockDiff := next.rockIndex - prev.rockIndex
+					nbrLeft := limit - next.rockIndex
+					freeIterations := nbrLeft / rockDiff
 
-				freeHeight = freeIterations * heightDiff
-				rockIndex += freeIterations * rockDiff
-				// clear cache to not catch again
-				stateLog = make(map[string]state)
-			} else {
-				stateLog[key] = next
+					freeHeight = freeIterations * heightDiff
+					rockIndex += freeIterations * rockDiff
+					// clear cache to not catch again
+					stateLog = make(map[string]state)
+				} else {
+					stateLog[key] = next
+				}
 			}
 		}
 	}
 
 	fmt.Println("part2:", len(world)-1+freeHeight, "in", time.Since(start))
 
+}
+
+func printIt(world rock) {
+	for i := 0; i < len(world)-1; i++ {
+		y := len(world) - i - 1
+		sprintf := fmt.Sprintf("|%7b|", world[y])
+		sprintf = strings.ReplaceAll(sprintf, " ", ".")
+		sprintf = strings.ReplaceAll(sprintf, "0", ".")
+		sprintf = strings.ReplaceAll(sprintf, "1", "#")
+		fmt.Println(sprintf)
+	}
+	fmt.Println("+-------+")
 }
 
 func hash(world rock) string {

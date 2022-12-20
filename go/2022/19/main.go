@@ -147,11 +147,11 @@ func (q *queue) dequeue() *state {
 	return p
 }
 
-func (b *blueprint) calculate() int {
+func (b *blueprint) calculate(time int) int {
 	q := newQueue()
 
 	initialState := state{
-		timeLeft: 24,
+		timeLeft: time,
 		oreRobot: 1,
 	}
 
@@ -212,7 +212,7 @@ func (b *blueprint) calculate() int {
 		q.add(s2)
 	}
 
-	return b.id * max
+	return max
 }
 
 func main() {
@@ -225,13 +225,23 @@ func main() {
 
 	blueprints := make([]*blueprint, 0)
 
-	part1 := 0
 	for _, s := range inFile {
 		b := newBlueprint(s)
 		blueprints = append(blueprints, b)
-
-		part1 += b.calculate()
 	}
 
+	part1 := 0
+	for _, b := range blueprints {
+		part1 += b.id * b.calculate(24)
+	}
 	fmt.Println("part1:", part1, "in", time.Since(start))
+
+	part2 := 1
+	for i, b := range blueprints {
+		if i < 3 {
+			calculate := b.calculate(32)
+			part2 *= calculate
+		}
+	}
+	fmt.Println("part2:", part2, "in", time.Since(start))
 }
