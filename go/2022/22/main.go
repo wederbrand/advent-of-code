@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const size = 50
+
 type point struct {
 	x     int
 	y     int
@@ -36,12 +38,16 @@ func walk(steps int, x *int, y *int, dx *int, dy *int, m map[string]*point) {
 	for i := 0; i < steps; i++ {
 		nextX := *x + *dx
 		nextY := *y + *dy
+		nextDx := *dx // copy of value
+		nextDy := *dy // copy of value
 		p, found := m[key(nextX, nextY)]
 
 		if !found {
 			// out of bounds, warp
-			warp(x, y, dx, dy)
-			p = m[key(*x, *y)]
+			nextX = *x
+			nextY = *y
+			warp(&nextX, &nextY, &nextDx, &nextDy)
+			p = m[key(nextX, nextY)]
 		}
 
 		if p.value == "#" {
@@ -52,6 +58,8 @@ func walk(steps int, x *int, y *int, dx *int, dy *int, m map[string]*point) {
 			// no stone, walk
 			*x = p.x
 			*y = p.y
+			*dx = nextDx
+			*dy = nextDy
 		}
 	}
 	//fmt.Println(*dx, *dy)
@@ -59,129 +67,129 @@ func walk(steps int, x *int, y *int, dx *int, dy *int, m map[string]*point) {
 
 // move one step and change x, y, dx and dy
 func warp(x *int, y *int, dx *int, dy *int) {
-	if *x == 99 && *y >= 50 && *y <= 99 && *dx == 1 {
+	if *x == (2*size-1) && *y >= size && *y <= (2*size-1) && *dx == 1 {
 		// C right -> B bottom
 		*dx = 0
 		*dy = -1
-		*x = 100 + *y - 50
-		*y = 49
+		*x = 2*size + *y - size
+		*y = size - 1
 		return
 	}
 
-	if *y == 49 && *x >= 100 && *x <= 150 && *dy == 1 {
+	if *y == (size-1) && *x >= (2*size) && *x <= (3*size-1) && *dy == 1 {
 		// B bottom -> C left
 		*dx = -1
 		*dy = 0
-		*y = 50 + *x - 100
-		*x = 99
+		*y = size + *x - 2*size
+		*x = 2*size - 1
 		return
 	}
 
-	if *x == 149 && *y >= 0 && *y <= 49 && *dx == 1 {
-		// B right -> F left
+	if *x == (3*size-1) && *y >= (0*size) && *y <= (1*size-1) && *dx == 1 {
+		// B right -> E right
 		*dx = -1
 		*dy = 0
-		*x = 49
-		*y = 150 + 49 - *y
+		*x = (2*size - 1)
+		*y = (3*size - 1) - *y
 		return
 	}
 
-	if *x == 49 && *y >= 150 && *y <= 199 && *dx == 1 {
+	if *x == (size-1) && *y >= (3*size) && *y <= (4*size-1) && *dx == 1 {
 		// F right -> E bottom
 		*dx = 0
 		*dy = -1
-		*x = 50 + *y - 150
-		*y = 149
+		*x = size + *y - 3*size
+		*y = (3*size - 1)
 		return
 	}
 
-	if *y == 149 && *x >= 50 && *x <= 99 && *dy == 1 {
+	if *y == (3*size-1) && *x >= (1*size) && *x <= (2*size-1) && *dy == 1 {
 		// E bottom -> F left
 		*dx = -1
 		*dy = 0
-		*y = 150 + *x - 50
-		*x = 49
+		*y = 3*size + *x - size
+		*x = size - 1
 		return
 	}
 
-	if *x == 99 && *y >= 100 && *y <= 149 && *dx == 1 {
-		// E right -> B left
+	if *x == (2*size-1) && *y >= (2*size) && *y <= (3*size-1) && *dx == 1 {
+		// E right -> B right
 		*dx = -1
 		*dy = 0
-		*x = 149
-		*y = 0 + 150 - *y
+		*x = (3*size - 1)
+		*y = 0 + (3*size - 1) - *y
 		return
 	}
 
-	if *y == 199 && *x >= 0 && *x <= 49 && *dy == 1 {
+	if *y == (4*size-1) && *x >= (0*size) && *x <= (1*size-1) && *dy == 1 {
 		// F bottom -> B top
 		*dx = 0
 		*dy = 1
-		*x = 100 + *x
-		*y = 0 // <- error
+		*x = 2*size + *x
+		*y = 0
 		return
 	}
 
-	if *y == 100 && *x >= 0 && *x <= 49 && *dy == -1 {
+	if *y == (2*size) && *x >= (0*size) && *x <= (1*size-1) && *dy == -1 {
 		// D top -> C left
 		*dx = 1
 		*dy = 0
-		*y = 50 + *x
-		*x = 50
+		*y = size + *x
+		*x = size
 		return
 	}
 
-	if *x == 50 && *y >= 50 && *y <= 99 && *dx == -1 {
+	if *x == size && *y >= (1*size) && *y <= (2*size-1) && *dx == -1 {
 		// C left -> D top
 		*dx = 0
 		*dy = 1
-		*x = 0 + *y - 50
-		*y = 100
+		*x = 0 + *y - size
+		*y = 2 * size
 		return
 	}
 
-	if *x == 0 && *y >= 100 && *y <= 149 && *dx == -1 {
+	if *x == 0 && *y >= (2*size) && *y <= (3*size-1) && *dx == -1 {
 		// D left -> A left
 		*dx = 1
 		*dy = 0
-		*x = 50
-		*y = 149 - *y
+		*x = size
+		*y = (3*size - 1) - *y
 		return
 	}
 
-	if *y == 0 && *x >= 50 && *x <= 99 && *dy == -1 {
+	if *y == 0 && *x >= (1*size) && *x <= (2*size-1) && *dy == -1 {
 		// A top -> F left
 		*dx = 1
 		*dy = 0
-		*y = 150 + *x - 50
+		*y = 3*size + *x - size
 		*x = 0
 		return
 	}
 
-	if *y == 0 && *x >= 100 && *x <= 149 && *dy == -1 {
+	if *y == 0 && *x >= (2*size) && *x <= (3*size-1) && *dy == -1 {
 		// B top -> F bottom
 		*dx = 0
 		*dy = -1
-		*x = *x - 100
-		*y = 199
+		*x = *x - 2*size
+		*y = (4*size - 1)
 		return
 	}
 
-	if *x == 0 && *y >= 150 && *y <= 199 && *dx == -1 {
+	if *x == 0 && *y >= (3*size) && *y <= (4*size-1) && *dx == -1 {
 		// F left -> A top
 		*dx = 0
 		*dy = 1
-		*x = 50 + *y - 150 // <- error
-		*y = 0             // <- error
+		*x = size + *y - 3*size
+		*y = 0
 		return
 	}
 
-	if *x == 50 && *y >= 0 && *y <= 49 && *dx == -1 {
+	if *x == size && *y >= (0*size) && *y <= (1*size-1) && *dx == -1 {
 		// A left -> D left
 		*dx = 1
 		*dy = 0
 		*x = 0
-		*y = 100 + 49 - *y
+		*y = 2*size + size - 1 - *y
 		return
 	}
 
@@ -221,7 +229,7 @@ func main() {
 	dx := 1
 	dy := 0
 
-	printIt(m)
+	//printIt(m)
 
 	for _, r := range instructions {
 		switch r {
@@ -245,25 +253,31 @@ func main() {
 	}
 	// walk if we have more steps to walk
 	walk(nbrSteps, &x, &y, &dx, &dy, m)
-	printIt(m)
+	//printIt(m)
 
 	part2 := 1000 * (y + 1)
 	part2 += 4 * (x + 1)
-	switch {
-	case dx == 1 && dy == 0:
-		part2 += 0
-	case dx == 0 && dy == 1:
-		part2 += 1
-	case dx == -1 && dy == 0:
-		part2 += 2
-	case dx == 0 && dy == -1:
-		part2 += 3
-	}
+	part2 += direction(dx, dy)
 
 	// not  46324
 	// not  46325, it's too low
 	// not 126049, it's too low
 	fmt.Println("part2:", part2, "in", time.Since(start))
+}
+
+func direction(dx int, dy int) int {
+	switch {
+	case dx == 1 && dy == 0:
+		return 0
+	case dx == 0 && dy == 1:
+		return 1
+	case dx == -1 && dy == 0:
+		return 2
+	case dx == 0 && dy == -1:
+		return 3
+	}
+	panic("weird direction")
+	return -1
 }
 
 func printIt(m map[string]*point) {
