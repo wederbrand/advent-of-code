@@ -159,32 +159,66 @@ func main() {
 
 	printIt(m, 1)
 
-	q := newQueue()
+	t := 0
+	{ // part1
+		q := newQueue()
+		// initial state (pretend the first step is made
+		initialState := state{
+			p:     point{x: 0, y: -1},
+			steps: 0,
+			score: t + maxX + maxY,
+		}
+		q.add(&initialState)
 
-	// initial state (pretend the first step is made
-	initialState := state{
-		p:     point{x: 0, y: 0},
-		steps: 1, // to pretend this is after the first step
-		score: maxX + maxY,
+		// exit point (pretending the next step can always happen)
+		exit := point{x: maxX, y: maxY + 1}
+
+		t = doIt(initialState, q, exit, blizzards) - 1
+		fmt.Println("part1/1", t, "in", time.Since(start))
 	}
-	q.add(&initialState)
+	{ // part2 -1
+		q := newQueue()
+		// initial state (pretend the first step is made
+		initialState := state{
+			p:     point{x: maxX, y: maxY + 1},
+			steps: t,
+			score: t + maxX + maxY,
+		}
+		q.add(&initialState)
 
-	// exit point (pretending the next step can always happen)
-	exit := point{
-		x: maxX,
-		y: maxY,
+		// exit point (pretending the next step can always happen)
+		exit := point{x: 0, y: -1}
+
+		t = doIt(initialState, q, exit, blizzards) - 1
+		fmt.Println("part2/1", t, "in", time.Since(start))
 	}
+	{ // part2 -2
+		q := newQueue()
+		// initial state (pretend the first step is made
+		initialState := state{
+			p:     point{x: 0, y: -1},
+			steps: t,
+			score: t + maxX + maxY,
+		}
+		q.add(&initialState)
 
+		// exit point (pretending the next step can always happen)
+		exit := point{x: maxX, y: maxY + 1}
+
+		t = doIt(initialState, q, exit, blizzards) - 1
+		fmt.Println("part2/1", t, "in", time.Since(start))
+	}
+}
+
+func doIt(initialState state, q *queue, exit point, blizzards map[string]*point) int {
 	seen := make(map[state]bool)
 	seen[initialState] = true
 	for len(q.states) > 0 {
 		s := q.dequeue()
-		fmt.Println("q:", len(q.states), s.steps, s.score, s.p.x, s.p.y)
 		// move time
 		t := s.steps + 1
 		if s.p == exit {
-			fmt.Println("part1", t, "in", time.Since(start))
-			break
+			return t
 		}
 		// create the map according to current time
 		m := make(map[string]int)
@@ -201,7 +235,11 @@ func main() {
 			p.x += dx[i]
 			p.y += dy[i]
 
-			if p.x < minX || p.x > maxX || p.y < minY || p.y > maxY {
+			if p.x == maxX && p.y == maxY+1 {
+				// entry/exit, all good
+			} else if p.x == 0 && p.y == minY-1 {
+				// entry/exit, all good
+			} else if p.x < minX || p.x > maxX || p.y < minY || p.y > maxY {
 				continue
 			}
 
@@ -210,16 +248,23 @@ func main() {
 				s2 := state{
 					p:     p,
 					steps: s.steps + 1,
-					score: s.steps + 1 + maxX - p.x + maxY - p.y,
+					score: s.steps + 1 + absInt(exit.x-p.x) + absInt(exit.y-p.y),
 				}
 				if seen[s2] == false {
 					seen[s2] = true
 					q.add(&s2)
-
 				}
 			}
-
 		}
+	}
+	return 0
+}
+
+func absInt(i int) int {
+	if i > 0 {
+		return i
+	} else {
+		return -i
 	}
 }
 
