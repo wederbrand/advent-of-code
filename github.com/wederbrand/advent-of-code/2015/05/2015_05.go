@@ -2,18 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"strings"
+	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
 )
 
 func main() {
-	readFile, err := os.ReadFile("2015/05/2015_05.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	inFile := strings.Split(strings.TrimSpace(string(readFile)), "\n")
+	inFile := util.GetFileContents("2015/05/2015_05.txt", "\n")
 	count := 0
 	for _, word := range inFile {
 		if testIt(word) {
