@@ -5,35 +5,59 @@ import (
 	"time"
 )
 
+type conway struct {
+	cnt int
+	val int
+}
+
 func main() {
 	start := time.Now()
 
-	result := "3113322113"
-	for i := 0; i < 50; i++ {
-		result = lookAndSay(result)
-		fmt.Println("part2", i, " ", len(result), "in", time.Since(start))
-		start = time.Now()
-	}
+	results := make([]conway, 0)
+	results = append(results, conway{1, 3})
+	results = append(results, conway{2, 1})
+	results = append(results, conway{2, 3})
+	results = append(results, conway{2, 2})
+	results = append(results, conway{2, 1})
+	results = append(results, conway{1, 3})
 
-	fmt.Println("part2", len(result), "in", time.Since(start))
+	for i := 0; i < 40; i++ {
+		results = lookAndSay(results)
+	}
+	fmt.Println("part1", count(results), "in", time.Since(start))
+
+	for i := 0; i < 10; i++ {
+		results = lookAndSay(results)
+	}
+	fmt.Println("part2", count(results), "in", time.Since(start))
 }
 
-func lookAndSay(in string) (out string) {
-	currentNbr := 0
-	currentRune := ' '
-	for _, r := range []rune(in) {
-		if r == currentRune {
-			currentNbr++
-		} else {
-			if currentNbr > 0 {
-				out += fmt.Sprintf("%d%d", currentNbr, currentRune-'0')
-			}
-			currentNbr = 1
-			currentRune = r
-		}
+func count(results []conway) int {
+	cnt := 0
+	for _, c := range results {
+		cnt += c.cnt
 	}
-	if currentNbr > 0 {
-		out += fmt.Sprintf("%d%d", currentNbr, currentRune-'0')
+
+	return cnt
+}
+
+func lookAndSay(in []conway) (out []conway) {
+	for _, c := range in {
+		out = append(out, conway{1, c.cnt})
+		out = append(out, conway{1, c.val})
+	}
+
+	out = merge(out)
+	return
+}
+
+func merge(in []conway) (out []conway) {
+	for i, c := range in {
+		if i > 0 && out[len(out)-1].val == c.val {
+			out[len(out)-1].cnt += c.cnt
+		} else {
+			out = append(out, c)
+		}
 	}
 
 	return
