@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -32,4 +33,38 @@ func StringOrNumber(in string) (string, int) {
 func Atoi(in string) int {
 	i, _ := strconv.Atoi(in)
 	return i
+}
+
+func MaxOf(a int, b int) int {
+	if a >= b {
+		return a
+	} else {
+		return b
+	}
+}
+
+var printed = false
+
+func PrintOnce(a ...any) {
+	if !printed {
+		fmt.Println(a)
+	}
+	printed = true
+}
+
+func Keys(all map[string]bool) (keys []string) {
+	for city := range all {
+		keys = append(keys, city)
+	}
+
+	return
+}
+
+func AllBut(all []string, but string) (result []string) {
+	for _, city := range all {
+		if city != but {
+			result = append(result, city)
+		}
+	}
+	return result
 }
