@@ -98,3 +98,26 @@ func Permutations(arr []string) [][]string {
 func Key(a string, b string) string {
 	return fmt.Sprintf("%s|%s", a, b)
 }
+
+// Gcd returns the greatest common divisor
+// written by ChatGPT
+func Gcd(x, y int) int {
+	for y != 0 {
+		x, y = y, x%y
+	}
+	return x
+}
+
+// Lcd returns the Least Common Denominator
+// written by ChatGPT
+func Lcd(numbers []int) int {
+	// initialize least common denominator to the first number in the slice
+	lcd := numbers[0]
+
+	// find the least common denominator by taking the gcd of the lcd and each subsequent number in the slice
+	for _, number := range numbers[1:] {
+		lcd = (lcd * number) / Gcd(lcd, number)
+	}
+
+	return lcd
+}
