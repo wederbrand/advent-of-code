@@ -68,3 +68,33 @@ func AllBut(all []string, but string) (result []string) {
 	}
 	return result
 }
+
+// Permutations return all permutations of the input array
+// written by ChatGPT
+func Permutations(arr []string) [][]string {
+	var helper func([]string, int)
+	var res [][]string
+
+	helper = func(arr []string, n int) {
+		if n == 1 {
+			tmp := make([]string, len(arr))
+			copy(tmp, arr)
+			res = append(res, tmp)
+		} else {
+			for i := 0; i < n; i++ {
+				helper(arr, n-1)
+				if n%2 == 1 {
+					arr[i], arr[n-1] = arr[n-1], arr[i]
+				} else {
+					arr[0], arr[n-1] = arr[n-1], arr[0]
+				}
+			}
+		}
+	}
+	helper(arr, len(arr))
+	return res
+}
+
+func Key(a string, b string) string {
+	return fmt.Sprintf("%s|%s", a, b)
+}
