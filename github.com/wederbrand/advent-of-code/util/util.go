@@ -70,7 +70,6 @@ func AllBut(all []string, but string) (result []string) {
 }
 
 // Permutations return all permutations of the input array
-// written by ChatGPT
 func Permutations(arr []string) [][]string {
 	var helper func([]string, int)
 	var res [][]string
@@ -100,7 +99,6 @@ func Key(a string, b string) string {
 }
 
 // Gcd returns the greatest common divisor
-// written by ChatGPT
 func Gcd(x, y int) int {
 	for y != 0 {
 		x, y = y, x%y
@@ -109,7 +107,6 @@ func Gcd(x, y int) int {
 }
 
 // Lcd returns the Least Common Denominator
-// written by ChatGPT
 func Lcd(numbers []int) int {
 	// initialize least common denominator to the first number in the slice
 	lcd := numbers[0]
