@@ -21,7 +21,7 @@ func main() {
 			if unicode.IsNumber(r) {
 				numbers[i] = int(r - '0')
 			} else {
-				for j := i; j <= len(s); j++ {
+				for j := i; j <= len(s) && j-i <= 5; j++ {
 					if strings.HasPrefix(s[i:j], "one") {
 						numbers[i] = 1
 						break
