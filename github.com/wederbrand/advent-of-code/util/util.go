@@ -98,6 +98,10 @@ func Key(a string, b string) string {
 	return fmt.Sprintf("%s|%s", a, b)
 }
 
+func IntKey(x int, y int) string {
+	return fmt.Sprintf("%d|%d", x, y)
+}
+
 // Gcd returns the greatest common divisor
 func Gcd(x, y int) int {
 	for y != 0 {
