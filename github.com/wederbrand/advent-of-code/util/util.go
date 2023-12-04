@@ -69,6 +69,36 @@ func AllBut(all []string, but string) (result []string) {
 	return result
 }
 
+func MatchingNumbersAfterSplitOnAny(in string, splitOn string) (result [][]int) {
+	fieldsFunc := strings.FieldsFunc(in, func(r rune) bool {
+		return strings.ContainsRune(splitOn, r)
+	})
+
+	for i, s := range fieldsFunc {
+		result = append(result, []int{})
+		raw := strings.Split(strings.TrimSpace(s), " ")
+		for _, number := range raw {
+			if number != "" {
+				atoi := Atoi(number)
+				result[i] = append(result[i], atoi)
+			}
+		}
+	}
+
+	return
+}
+
+// Contains returns true if b contains a
+func Contains(a int, b []int) bool {
+	for _, i := range b {
+		if a == i {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Permutations return all permutations of the input array
 func Permutations(arr []string) [][]string {
 	var helper func([]string, int)
@@ -100,6 +130,13 @@ func Key(a string, b string) string {
 
 func IntKey(x int, y int) string {
 	return fmt.Sprintf("%d|%d", x, y)
+}
+
+func FirstRune(s string) rune {
+	for _, r := range s {
+		return r
+	}
+	return 0
 }
 
 // Gcd returns the greatest common divisor
