@@ -66,5 +66,33 @@ func main() {
 	}
 
 	fmt.Println("part1: ", part1, "in", time.Since(start))
-	//fmt.Println("part2: ", part2, "in", time.Since(start))
+
+	part2 := math.MaxInt
+	cs := make([]chan int, 0)
+	for i := 0; i < len(seeds); i += 2 {
+		c := make(chan int)
+		cs = append(cs, c)
+		go solveOne(seeds, i, maps, c)
+	}
+
+	for _, c := range cs {
+		part2 = util.MinOf(part2, <-c)
+	}
+
+	fmt.Println("part2: ", part2, "in", time.Since(start))
+}
+
+func solveOne(seeds []int, i int, maps []*trans, c chan int) {
+	internalMin := math.MaxInt
+	for j := 0; j < seeds[i+1]; j++ {
+		if j%10000000 == 0 {
+			fmt.Println(i, len(seeds), j, seeds[i+1], (j*100.0)/seeds[i+1])
+		}
+		currentPos := j + seeds[i]
+		for _, m := range maps {
+			currentPos = m.findOut(currentPos)
+		}
+		internalMin = util.MinOf(internalMin, currentPos)
+	}
+	c <- internalMin
 }
