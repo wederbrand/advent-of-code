@@ -35,6 +35,14 @@ func Atoi(in string) int {
 	return i
 }
 
+func MinOf(a int, b int) int {
+	if a <= b {
+		return a
+	} else {
+		return b
+	}
+}
+
 func MaxOf(a int, b int) int {
 	if a >= b {
 		return a
