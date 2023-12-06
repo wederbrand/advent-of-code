@@ -169,3 +169,26 @@ func Lcd(numbers []int) int {
 
 	return lcd
 }
+
+func BinarySearch(start int, end int, fn func(int) bool) (last int, first int) {
+	if fn(start) {
+		panic("the start value must produce false")
+	}
+	if !fn(end) {
+		panic("the end value must produce false")
+	}
+
+	last = start // last that still produces false
+	first = end  // first tha produces true
+
+	for first-last != 1 {
+		candidate := (first + last) / 2
+		if fn(candidate) {
+			first = candidate
+		} else {
+			last = candidate
+		}
+	}
+
+	return last, first
+}

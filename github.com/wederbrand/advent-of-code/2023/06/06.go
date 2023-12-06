@@ -28,14 +28,10 @@ func solve(times []int, dists []int) int {
 	for i := range times {
 		t := times[i]
 		d := dists[i]
-		ways := 0
-		for j := 0; j < t; j++ {
-			travelled := j * (t - j)
-			if travelled > d {
-				ways++
-			}
-		}
-		result *= ways
+		_, first := util.BinarySearch(0, t/2, func(i int) bool {
+			return i*(t-i) > d
+		})
+		result *= t - 2*first + 1
 	}
 	return result
 }
