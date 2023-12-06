@@ -87,8 +87,10 @@ func MatchingNumbersAfterSplitOnAny(in string, splitOn string) (result [][]int) 
 		raw := strings.Split(strings.TrimSpace(s), " ")
 		for _, number := range raw {
 			if number != "" {
-				atoi := Atoi(number)
-				result[i] = append(result[i], atoi)
+				atoi, err := strconv.Atoi(number)
+				if err == nil {
+					result[i] = append(result[i], atoi)
+				}
 			}
 		}
 	}
