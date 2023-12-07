@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
 	"slices"
@@ -86,23 +87,24 @@ func main() {
 		hands = append(hands, newHand(s))
 	}
 
-	sort.Slice(hands, func(a, b int) bool {
-		if hands[a].score == hands[b].score {
-			for i := range hands[a].cards {
-				aCard := hands[a].cards[i]
-				bCard := hands[b].cards[i]
+	slices.SortFunc(hands, func(a, b *Hand) int {
+		if a.score == b.score {
+			for i := range a.cards {
+				aCard := a.cards[i]
+				bCard := b.cards[i]
 				if aCard == bCard {
 					continue
 				} else {
-					return aCard > bCard
+					return cmp.Compare(aCard, bCard)
 				}
 			}
 		} else {
-			return hands[a].score > hands[b].score
+			return cmp.Compare(a.score, b.score)
 		}
 
 		panic("ho no")
 	})
+	slices.Reverse(hands)
 
 	part2 := 0
 	for i, hand := range hands {
