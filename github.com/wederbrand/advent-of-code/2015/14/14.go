@@ -34,7 +34,7 @@ func main() {
 
 	for i := 0; i < 2503; i++ {
 		scores := make(map[int][]*deer)
-		max := math.MinInt
+		maxValue := math.MinInt
 		for _, d := range deers {
 			if d.flying {
 				d.distance += d.speed
@@ -51,23 +51,23 @@ func main() {
 				}
 			}
 			scores[d.distance] = append(scores[d.distance], d)
-			max = util.MaxOf(max, d.distance)
+			maxValue = max(maxValue, d.distance)
 		}
-		for _, d := range scores[max] {
+		for _, d := range scores[maxValue] {
 			d.score++
 		}
 	}
 
 	part1 := math.MinInt
 	for _, d := range deers {
-		part1 = util.MaxOf(part1, d.distance)
+		part1 = max(part1, d.distance)
 	}
 
 	fmt.Println("part1", part1, "in", time.Since(start))
 
 	part2 := math.MinInt
 	for _, d := range deers {
-		part2 = util.MaxOf(part2, d.score)
+		part2 = max(part2, d.score)
 	}
 
 	fmt.Println("part2", part2, "in", time.Since(start))

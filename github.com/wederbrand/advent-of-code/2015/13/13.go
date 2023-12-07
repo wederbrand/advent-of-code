@@ -41,7 +41,7 @@ func main() {
 			happiness += gains[util.Key(alternative[i], alternative[j])]
 			happiness += gains[util.Key(alternative[j], alternative[i])]
 		}
-		part1 = util.MaxOf(part1, happiness)
+		part1 = max(part1, happiness)
 	}
 
 	fmt.Println("part1", part1, "in", time.Since(start))
@@ -65,7 +65,7 @@ func main() {
 			happiness += gains[util.Key(alternative[i], alternative[j])]
 			happiness += gains[util.Key(alternative[j], alternative[i])]
 		}
-		part2 = util.MaxOf(part2, happiness)
+		part2 = max(part2, happiness)
 	}
 
 	fmt.Println("part2", part2, "in", time.Since(start))

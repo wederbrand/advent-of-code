@@ -36,7 +36,7 @@ func main() {
 		q.Add(&s)
 	}
 
-	max := math.MinInt
+	maxValue := math.MinInt
 	for q.HasNext() {
 		s := q.Next()
 		// first element is current city, all others are remaining, visit all
@@ -44,7 +44,7 @@ func main() {
 		cities := s.Data.([]string)
 		if len(cities) == 1 {
 			// done
-			max = util.MaxOf(max, s.Priority)
+			maxValue = max(maxValue, s.Priority)
 			util.PrintOnce("part1", s.Priority, "in", time.Since(start))
 		}
 		src := cities[0]
@@ -58,7 +58,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("part2", max, "in", time.Since(start))
+	fmt.Println("part2", maxValue, "in", time.Since(start))
 }
 
 func key(src string, dst string) string {

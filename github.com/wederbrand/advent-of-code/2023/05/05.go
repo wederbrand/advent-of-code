@@ -119,7 +119,7 @@ func main() {
 	}
 	part1 := math.MaxInt
 	for _, r := range ranges {
-		part1 = util.MinOf(part1, r.start)
+		part1 = min(part1, r.start)
 	}
 	fmt.Println("part1: ", part1, "in", time.Since(start))
 
@@ -132,7 +132,7 @@ func main() {
 	}
 	part2 := math.MaxInt
 	for _, r := range ranges {
-		part2 = util.MinOf(part2, r.start)
+		part2 = min(part2, r.start)
 	}
 	fmt.Println("part2: ", part2, "in", time.Since(start))
 }

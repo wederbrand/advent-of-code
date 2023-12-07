@@ -35,22 +35,6 @@ func Atoi(in string) int {
 	return i
 }
 
-func MinOf(a int, b int) int {
-	if a <= b {
-		return a
-	} else {
-		return b
-	}
-}
-
-func MaxOf(a int, b int) int {
-	if a >= b {
-		return a
-	} else {
-		return b
-	}
-}
-
 var printed = false
 
 func PrintOnce(a ...any) {
@@ -191,10 +175,4 @@ func BinarySearch(start int, end int, fn func(int) bool) (last int, first int) {
 	}
 
 	return last, first
-}
-
-func ReverseSlice(s []int) {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
 }

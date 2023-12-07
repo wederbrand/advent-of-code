@@ -28,19 +28,19 @@ func main() {
 			color := matches[2]
 			cnt := util.Atoi(matches[1])
 			if color == "red" {
-				minRed = util.MaxOf(minRed, cnt)
+				minRed = max(minRed, cnt)
 				if cnt > 12 {
 					possible = false
 				}
 			}
 			if color == "green" {
-				minGreen = util.MaxOf(minGreen, cnt)
+				minGreen = max(minGreen, cnt)
 				if cnt > 13 {
 					possible = false
 				}
 			}
 			if color == "blue" {
-				minBlue = util.MaxOf(minBlue, cnt)
+				minBlue = max(minBlue, cnt)
 				if cnt > 14 {
 					possible = false
 				}

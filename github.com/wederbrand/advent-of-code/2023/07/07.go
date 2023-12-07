@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -51,7 +52,7 @@ func newHand(s string) *Hand {
 	}
 
 	sort.Ints(count)
-	util.ReverseSlice(count)
+	slices.Reverse(count)
 
 	if jokers == 5 || count[0]+jokers == 5 {
 		h.score = 7
