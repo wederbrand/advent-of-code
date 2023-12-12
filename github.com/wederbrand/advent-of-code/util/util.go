@@ -62,14 +62,14 @@ func AllBut(all []string, but string) (result []string) {
 	return result
 }
 
-func MatchingNumbersAfterSplitOnAny(in string, splitOn string) (result [][]int) {
+func MatchingNumbersAfterSplitOnAny(in string, splitOn string, separator string) (result [][]int) {
 	fieldsFunc := strings.FieldsFunc(in, func(r rune) bool {
 		return strings.ContainsRune(splitOn, r)
 	})
 
 	for i, s := range fieldsFunc {
 		result = append(result, []int{})
-		raw := strings.Split(strings.TrimSpace(s), " ")
+		raw := strings.Split(strings.TrimSpace(s), separator)
 		for _, number := range raw {
 			if number != "" {
 				atoi, err := strconv.Atoi(number)
