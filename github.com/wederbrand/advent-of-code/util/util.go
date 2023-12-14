@@ -187,3 +187,86 @@ func BinarySearch(start int, end int, fn func(int) bool) (last int, first int) {
 
 	return last, first
 }
+
+func MakeMap(in []string) map[string]string {
+	m := make(map[string]string)
+
+	for y, s := range in {
+		for x, r := range s {
+			if r == '.' {
+				continue
+			}
+			key := IntKey(x, y)
+			m[key] = string(r)
+		}
+	}
+
+	return m
+}
+
+func RotateClockWise(in map[string]string) map[string]string {
+	// For my reversed Y clockwise is the same a normal counterclockwise
+	// 90° counterclockwise rotation: (𝑥,𝑦) becomes (−𝑦,𝑥)
+
+	out := make(map[string]string)
+
+	for key, value := range in {
+		x, y := DeKey(key)
+		newKey := IntKey(-y, x)
+		out[newKey] = value
+	}
+
+	return out
+}
+
+func GetMapMaxes(m map[string]string) (int, int, int, int) {
+	minX := math.MaxInt
+	minY := math.MaxInt
+	maxX := math.MinInt
+	maxY := math.MinInt
+	for k := range m {
+		x, y := DeKey(k)
+		minX = min(minX, x)
+		minY = min(minY, y)
+		maxX = max(maxX, x)
+		maxY = max(maxY, y)
+	}
+	return minX, minY, maxX, maxY
+}
+
+func PrintMap(m map[string]string) {
+	minX, minY, maxX, maxY := GetMapMaxes(m)
+	for y := minY; y <= maxY; y++ {
+		for x := minX; x <= maxX; x++ {
+			s, found := m[IntKey(x, y)]
+			if !found {
+				fmt.Print(".")
+			} else {
+				fmt.Print(s)
+			}
+		}
+		fmt.Println()
+	}
+
+	fmt.Println()
+	fmt.Println()
+}
+
+func MapAsString(m map[string]string) string {
+	minX, minY, maxX, maxY := GetMapMaxes(m)
+
+	out := ""
+	for y := minY; y <= maxY; y++ {
+		for x := minX; x <= maxX; x++ {
+			s, found := m[IntKey(x, y)]
+			if !found {
+				out += "."
+			} else {
+				out += s
+			}
+		}
+		out += "|"
+	}
+
+	return out
+}
