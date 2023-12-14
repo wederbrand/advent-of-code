@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
-	"math"
 	"time"
 )
 
@@ -41,39 +40,29 @@ func main() {
 }
 
 func analyze(m map[string]bool, nbrErrors int) int {
-	// find either vertical or horizontal line
-	minX := math.MaxInt
-	minY := math.MaxInt
-	maxX := math.MinInt
-	maxY := math.MinInt
-	for k := range m {
-		x, y := util.DeKey(k)
-		minX = min(minX, x)
-		minY = min(minY, y)
-		maxX = max(maxX, x)
-		maxY = max(maxY, y)
-	}
-
 	// test potential vertical mirrors
-	// between x and x+
+	// between x and x+ (left to right)
+	minX, minY, maxX, maxY := util.GetMapMaxes(m)
 	for x := minX; x < maxX; x++ {
-		if isXMirror(m, x, minX, minY, maxX, maxY, nbrErrors) {
+		if isMirror(m, x, minX, minY, maxX, maxY, nbrErrors) {
 			return x + 1
 		}
 	}
 
-	// test potential horizontal mirrors
-	// between y and y+
-	for y := minY; y < maxY; y++ {
-		if isYMirror(m, y, minX, minY, maxX, maxY, nbrErrors) {
-			return 100 * (y + 1)
+	// test potential horizontal mirrors by rotating the map counter clock wise
+	// between y and y+ (left to right, former top to bottom)
+	m = util.RotateCounterClockWise(m)
+	minX, minY, maxX, maxY = util.GetMapMaxes(m)
+	for x := minX; x < maxX; x++ {
+		if isMirror(m, x, minX, minY, maxX, maxY, nbrErrors) {
+			return 100 * (x + 1)
 		}
 	}
 
 	panic("ho ho")
 }
 
-func isXMirror(m map[string]bool, mirror int, minX int, minY int, maxX int, maxY int, errors int) bool {
+func isMirror(m map[string]bool, mirror int, minX int, minY int, maxX int, maxY int, errors int) bool {
 	// start with both sides of mirror
 	// walk outwards
 	mirroredX := mirror
@@ -92,34 +81,6 @@ func isXMirror(m map[string]bool, mirror int, minX int, minY int, maxX int, maxY
 				errors--
 				if errors < 0 {
 					// not identical enough, this x can't work
-					return false
-				}
-			}
-		}
-	}
-	// outside, all is good
-	return errors == 0
-}
-
-func isYMirror(m map[string]bool, mirror int, minX int, minY int, maxX int, maxY int, errors int) bool {
-	// start with both sides of mirror
-	// walk outwards
-	mirroredY := mirror
-	for y := mirror; y >= minY; y-- {
-		mirroredY++
-		if mirroredY > maxY {
-			// outside, all is good
-			return errors == 0
-		}
-
-		// test entire row
-		for x := minX; x <= maxX; x++ {
-			_, a := m[util.IntKey(x, y)]
-			_, b := m[util.IntKey(x, mirroredY)]
-			if a != b {
-				errors--
-				if errors < 0 {
-					// not identical enough, this y can't work
 					return false
 				}
 			}

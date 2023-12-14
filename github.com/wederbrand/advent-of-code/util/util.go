@@ -204,11 +204,11 @@ func MakeMap(in []string) map[string]string {
 	return m
 }
 
-func RotateClockWise(in map[string]string) map[string]string {
+func RotateClockWise[V interface{}](in map[string]V) map[string]V {
 	// For my reversed Y clockwise is the same a normal counterclockwise
 	// 90° counterclockwise rotation: (𝑥,𝑦) becomes (−𝑦,𝑥)
 
-	out := make(map[string]string)
+	out := make(map[string]V)
 
 	for key, value := range in {
 		x, y := DeKey(key)
@@ -219,7 +219,22 @@ func RotateClockWise(in map[string]string) map[string]string {
 	return out
 }
 
-func GetMapMaxes(m map[string]string) (int, int, int, int) {
+func RotateCounterClockWise[V interface{}](in map[string]V) map[string]V {
+	// For my reversed Y counterclockwise is the same a normal clockwise
+	// 90° clockwise rotation: (𝑥,𝑦) becomes (𝑦,-𝑥)
+
+	out := make(map[string]V)
+
+	for key, value := range in {
+		x, y := DeKey(key)
+		newKey := IntKey(y, -x)
+		out[newKey] = value
+	}
+
+	return out
+}
+
+func GetMapMaxes[V interface{}](m map[string]V) (int, int, int, int) {
 	minX := math.MaxInt
 	minY := math.MaxInt
 	maxX := math.MinInt
