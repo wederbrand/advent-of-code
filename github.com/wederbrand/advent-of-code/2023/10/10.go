@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
+type Dir [2]int
+
+var N = Dir{0, -1}
+var S = Dir{0, +1}
+var E = Dir{+1, 0}
+var W = Dir{-1, 0}
+
 type Pipe struct {
 	r rune
 
@@ -21,18 +28,18 @@ type Pipe struct {
 	touched bool
 }
 
-func (p Pipe) getNext(dir string) string {
-	if p.n && dir != "s" {
-		return "n"
+func (p Pipe) getNext(dir Dir) Dir {
+	if p.n && dir != S {
+		return N
 	}
-	if p.s && dir != "n" {
-		return "s"
+	if p.s && dir != N {
+		return S
 	}
-	if p.e && dir != "w" {
-		return "e"
+	if p.e && dir != W {
+		return E
 	}
-	if p.w && dir != "e" {
-		return "w"
+	if p.w && dir != E {
+		return W
 	}
 
 	panic("ho ho")
@@ -68,26 +75,26 @@ func main() {
 	}
 
 	// find directions of start pipe. also find one initial direction
-	var dir string
+	var dir Dir
 	n, foundN := m[util.IntKey(start.x, start.y-1)]
 	if foundN && n.s {
 		start.n = true
-		dir = "n"
+		dir = N
 	}
 	s, foundS := m[util.IntKey(start.x, start.y+1)]
 	if foundS && s.n {
 		start.s = true
-		dir = "s"
+		dir = S
 	}
 	e, foundE := m[util.IntKey(start.x+1, start.y)]
 	if foundE && e.w {
 		start.e = true
-		dir = "e"
+		dir = E
 	}
 	w, foundW := m[util.IntKey(start.x-1, start.y)]
 	if foundW && w.e {
 		start.w = true
-		dir = "w"
+		dir = W
 	}
 
 	sRune := 'S'
@@ -118,16 +125,7 @@ func main() {
 	for curr != start || dist == 0 {
 		curr.touched = true
 		dist++
-		switch dir {
-		case "n":
-			curr, _ = m[util.IntKey(curr.x, curr.y-1)]
-		case "s":
-			curr, _ = m[util.IntKey(curr.x, curr.y+1)]
-		case "e":
-			curr, _ = m[util.IntKey(curr.x+1, curr.y)]
-		case "w":
-			curr, _ = m[util.IntKey(curr.x-1, curr.y)]
-		}
+		curr, _ = m[util.IntKey(curr.x+dir[0], curr.y+dir[1])]
 		dir = curr.getNext(dir)
 	}
 
