@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
 	"time"
 )
 
 func main() {
 	startTimer := time.Now()
-	inFile := util.GetFileContents("2023/13/input.txt", "\n")
+	inFile := GetFileContents("2023/13/input.txt", "\n")
 
-	m := make(map[string]bool)
+	m := make(Map)
 	y := -1
 	part1 := 0
 	part2 := 0
@@ -19,7 +19,7 @@ func main() {
 			// analyze last pattern and start a new
 			part1 += analyze(m, 0)
 			part2 += analyze(m, 1)
-			m = make(map[string]bool)
+			m = make(Map)
 			y = -1
 			continue
 		}
@@ -27,8 +27,7 @@ func main() {
 		y++
 		for x, r := range s {
 			if r == '#' {
-				key := util.IntKey(x, y)
-				m[key] = true
+				m[Coord{x, y}] = "#"
 			}
 		}
 	}
@@ -39,22 +38,22 @@ func main() {
 	fmt.Println("part2: ", part2, "in", time.Since(startTimer))
 }
 
-func analyze(m map[string]bool, nbrErrors int) int {
+func analyze(m Map, nbrErrors int) int {
 	// test potential vertical mirrors
 	// between x and x+ (left to right)
-	minX, minY, maxX, maxY := util.GetMapMaxes(m)
-	for x := minX; x < maxX; x++ {
-		if isMirror(m, x, minX, minY, maxX, maxY, nbrErrors) {
+	minC, maxC := GetMapMaxes(m)
+	for x := minC.X; x < maxC.X; x++ {
+		if isMirror(m, x, minC.X, minC.Y, maxC.X, maxC.Y, nbrErrors) {
 			return x + 1
 		}
 	}
 
 	// test potential horizontal mirrors by rotating the map counter clock wise
 	// between y and y+ (left to right, former top to bottom)
-	m = util.RotateCounterClockWise(m)
-	minX, minY, maxX, maxY = util.GetMapMaxes(m)
-	for x := minX; x < maxX; x++ {
-		if isMirror(m, x, minX, minY, maxX, maxY, nbrErrors) {
+	m = RotateCounterClockWise(m)
+	minC, maxC = GetMapMaxes(m)
+	for x := minC.X; x < maxC.X; x++ {
+		if isMirror(m, x, minC.X, minC.Y, maxC.X, maxC.Y, nbrErrors) {
 			return 100 * (x + 1)
 		}
 	}
@@ -62,7 +61,7 @@ func analyze(m map[string]bool, nbrErrors int) int {
 	panic("ho ho")
 }
 
-func isMirror(m map[string]bool, mirror int, minX int, minY int, maxX int, maxY int, errors int) bool {
+func isMirror(m Map, mirror int, minX int, minY int, maxX int, maxY int, errors int) bool {
 	// start with both sides of mirror
 	// walk outwards
 	mirroredX := mirror
@@ -75,8 +74,8 @@ func isMirror(m map[string]bool, mirror int, minX int, minY int, maxX int, maxY 
 
 		// test entire column
 		for y := minY; y <= maxY; y++ {
-			_, a := m[util.IntKey(x, y)]
-			_, b := m[util.IntKey(mirroredX, y)]
+			_, a := m[Coord{x, y}]
+			_, b := m[Coord{mirroredX, y}]
 			if a != b {
 				errors--
 				if errors < 0 {

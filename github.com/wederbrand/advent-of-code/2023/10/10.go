@@ -2,17 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
 	"strings"
 	"time"
 )
-
-type Dir [2]int
-
-var N = Dir{0, -1}
-var S = Dir{0, +1}
-var E = Dir{+1, 0}
-var W = Dir{-1, 0}
 
 type Pipe struct {
 	r rune
@@ -60,7 +53,7 @@ func newPipe(r rune, x int, y int) *Pipe {
 
 func main() {
 	startTimer := time.Now()
-	inFile := util.GetFileContents("2023/10/input.txt", "\n")
+	inFile := GetFileContents("2023/10/input.txt", "\n")
 
 	m := make(map[string]*Pipe)
 	var start *Pipe
@@ -70,28 +63,28 @@ func main() {
 			if p.r == 'S' {
 				start = p
 			}
-			m[util.IntKey(x, y)] = p
+			m[IntKey(x, y)] = p
 		}
 	}
 
 	// find directions of start pipe. also find one initial direction
 	var dir Dir
-	n, foundN := m[util.IntKey(start.x, start.y-1)]
+	n, foundN := m[IntKey(start.x, start.y-1)]
 	if foundN && n.s {
 		start.n = true
 		dir = N
 	}
-	s, foundS := m[util.IntKey(start.x, start.y+1)]
+	s, foundS := m[IntKey(start.x, start.y+1)]
 	if foundS && s.n {
 		start.s = true
 		dir = S
 	}
-	e, foundE := m[util.IntKey(start.x+1, start.y)]
+	e, foundE := m[IntKey(start.x+1, start.y)]
 	if foundE && e.w {
 		start.e = true
 		dir = E
 	}
-	w, foundW := m[util.IntKey(start.x-1, start.y)]
+	w, foundW := m[IntKey(start.x-1, start.y)]
 	if foundW && w.e {
 		start.w = true
 		dir = W
@@ -125,7 +118,7 @@ func main() {
 	for curr != start || dist == 0 {
 		curr.touched = true
 		dist++
-		curr, _ = m[util.IntKey(curr.x+dir[0], curr.y+dir[1])]
+		curr, _ = m[IntKey(curr.x+dir[0], curr.y+dir[1])]
 		dir = curr.getNext(dir)
 	}
 
@@ -138,7 +131,7 @@ func main() {
 		in := false
 		var lastCorner rune
 		for x, r := range s {
-			p := m[util.IntKey(x, y)]
+			p := m[IntKey(x, y)]
 
 			if r == 'S' {
 				// the start rune needs special attention

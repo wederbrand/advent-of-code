@@ -14,7 +14,7 @@ func main() {
 	part1 := 0
 	part2 := 0
 	for _, s := range inFile {
-		in := util.MatchingNumbersAfterSplitOnAny(s, ":")[0]
+		in := util.MatchingNumbersAfterSplitOnAny(s, ":", " ")[0]
 		all = solve(in)
 		all = append(all, in)
 

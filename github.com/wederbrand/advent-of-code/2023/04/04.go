@@ -18,7 +18,7 @@ func main() {
 		cards[cardNbr] += 1
 		part2 += cards[cardNbr]
 
-		splits := util.MatchingNumbersAfterSplitOnAny(s, ":|")
+		splits := util.MatchingNumbersAfterSplitOnAny(s, ":|", " ")
 		winningNumbers := splits[1]
 		iHave := splits[2]
 

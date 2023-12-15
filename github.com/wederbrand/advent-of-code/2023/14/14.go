@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
 	"time"
 )
 
 func main() {
 	startTimer := time.Now()
-	inFile := util.GetFileContents("2023/14/input.txt", "\n")
+	inFile := GetFileContents("2023/14/input.txt", "\n")
 
-	m := util.MakeMap(inFile)
+	m := MakeMap(inFile)
 
 	rollNorth(m)
 	part1 := getWeight(m)
@@ -21,10 +21,10 @@ func main() {
 		for j := 0; j < 4; j++ {
 			// tilt and rotate 4 times
 			rollNorth(m)
-			m = util.RotateClockWise(m)
+			m = RotateClockWise(m)
 		}
 
-		s := util.MapAsString(m)
+		s := MapAsString(m)
 		lastIndex, found := seen[s]
 		if found {
 			cycle := i - lastIndex
@@ -40,24 +40,23 @@ func main() {
 	fmt.Println("part2: ", part2, "in", time.Since(startTimer))
 }
 
-func getWeight(m map[string]string) int {
-	_, _, _, maxY := util.GetMapMaxes(m)
+func getWeight(m Map) int {
+	_, maxC := GetMapMaxes(m)
 	weight := 0
 	for key, rock := range m {
-		_, y := util.DeKey(key)
 		if rock == "O" {
-			weight += maxY - y + 1
+			weight += maxC.Y - key.Y + 1
 		}
 	}
 	return weight
 }
 
-func rollNorth(m map[string]string) {
-	minX, minY, maxX, maxY := util.GetMapMaxes(m)
-	for y := minY; y <= maxY; y++ {
-		for x := minX; x <= maxX; x++ {
+func rollNorth(m Map) {
+	minC, maxC := GetMapMaxes(m)
+	for y := minC.Y; y <= maxC.Y; y++ {
+		for x := minC.X; x <= maxC.X; x++ {
 			// roll forward until blocked
-			key := util.IntKey(x, y)
+			key := Coord{x, y}
 			rock, found := m[key]
 			if !found {
 				continue
@@ -72,13 +71,13 @@ func rollNorth(m map[string]string) {
 
 			// roll to lower y
 			newY := y
-			for newY = y; newY > minY; newY-- {
-				_, filled := m[util.IntKey(x, newY-1)]
+			for newY = y; newY > minC.Y; newY-- {
+				_, filled := m[Coord{x, newY - 1}]
 				if filled {
 					break
 				}
 			}
-			newKey := util.IntKey(x, newY)
+			newKey := Coord{x, newY}
 			m[newKey] = rock
 		}
 	}

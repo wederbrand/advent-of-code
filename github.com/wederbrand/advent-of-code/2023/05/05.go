@@ -89,7 +89,7 @@ func main() {
 	var seeds []int
 	for _, s := range inFile {
 		if strings.HasPrefix(s, "seeds: ") {
-			seeds = util.MatchingNumbersAfterSplitOnAny(s, ":")[1]
+			seeds = util.MatchingNumbersAfterSplitOnAny(s, ":", " ")[1]
 			continue
 		}
 
@@ -105,7 +105,7 @@ func main() {
 		}
 
 		// mappings to the current map
-		mappings := util.MatchingNumbersAfterSplitOnAny(s, "")
+		mappings := util.MatchingNumbersAfterSplitOnAny(s, "", " ")
 		translation := newTranslation(mappings[0][0], mappings[0][1], mappings[0][2])
 		currentMap.translations = append(currentMap.translations, translation)
 	}

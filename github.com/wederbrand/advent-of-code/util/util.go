@@ -20,6 +20,24 @@ func GetFileContents(fileName string, splitOn string) []string {
 	return inFile
 }
 
+type Dir [2]int
+
+var N = Dir{0, -1}
+var UP = Dir{0, -1}
+var S = Dir{0, +1}
+var DOWN = Dir{0, +1}
+var E = Dir{+1, 0}
+var RIGHT = Dir{+1, 0}
+var W = Dir{-1, 0}
+var LEFT = Dir{-1, 0}
+
+type Coord struct {
+	X int
+	Y int
+}
+
+type Map map[Coord]string
+
 // StringOrNumber returns a number and an empty string if possible, otherwise the string
 func StringOrNumber(in string) (string, int) {
 	atoi, err := strconv.Atoi(in)
@@ -188,72 +206,66 @@ func BinarySearch(start int, end int, fn func(int) bool) (last int, first int) {
 	return last, first
 }
 
-func MakeMap(in []string) map[string]string {
-	m := make(map[string]string)
+func MakeMap(in []string) Map {
+	m := make(map[Coord]string)
 
 	for y, s := range in {
 		for x, r := range s {
 			if r == '.' {
 				continue
 			}
-			key := IntKey(x, y)
-			m[key] = string(r)
+			m[Coord{x, y}] = string(r)
 		}
 	}
 
 	return m
 }
 
-func RotateClockWise[V interface{}](in map[string]V) map[string]V {
+func RotateClockWise(in Map) Map {
 	// For my reversed Y clockwise is the same a normal counterclockwise
 	// 90° counterclockwise rotation: (𝑥,𝑦) becomes (−𝑦,𝑥)
 
-	out := make(map[string]V)
+	out := make(Map)
 
 	for key, value := range in {
-		x, y := DeKey(key)
-		newKey := IntKey(-y, x)
-		out[newKey] = value
+		out[Coord{-key.Y, key.X}] = value
 	}
 
 	return out
 }
 
-func RotateCounterClockWise[V interface{}](in map[string]V) map[string]V {
+func RotateCounterClockWise(in Map) Map {
 	// For my reversed Y counterclockwise is the same a normal clockwise
 	// 90° clockwise rotation: (𝑥,𝑦) becomes (𝑦,-𝑥)
 
-	out := make(map[string]V)
+	out := make(Map)
 
 	for key, value := range in {
-		x, y := DeKey(key)
-		newKey := IntKey(y, -x)
-		out[newKey] = value
+		out[Coord{key.Y, -key.X}] = value
 	}
 
 	return out
 }
 
-func GetMapMaxes[V interface{}](m map[string]V) (int, int, int, int) {
+func GetMapMaxes(m Map) (minC Coord, maxC Coord) {
 	minX := math.MaxInt
 	minY := math.MaxInt
 	maxX := math.MinInt
 	maxY := math.MinInt
 	for k := range m {
-		x, y := DeKey(k)
-		minX = min(minX, x)
-		minY = min(minY, y)
-		maxX = max(maxX, x)
-		maxY = max(maxY, y)
+		minX = min(minX, k.X)
+		minY = min(minY, k.Y)
+		maxX = max(maxX, k.X)
+		maxY = max(maxY, k.Y)
 	}
-	return minX, minY, maxX, maxY
+	return Coord{minX, minY}, Coord{maxX, maxY}
 }
 
-func PrintMap(m map[string]string) {
-	minX, minY, maxX, maxY := GetMapMaxes(m)
-	for y := minY; y <= maxY; y++ {
-		for x := minX; x <= maxX; x++ {
-			s, found := m[IntKey(x, y)]
+func PrintMap(m Map) {
+	minC, maxC := GetMapMaxes(m)
+	for y := minC.Y; y <= maxC.Y; y++ {
+		for x := minC.X; x <= maxC.X; x++ {
+			s, found := m[Coord{x, y}]
 			if !found {
 				fmt.Print(".")
 			} else {
@@ -267,13 +279,12 @@ func PrintMap(m map[string]string) {
 	fmt.Println()
 }
 
-func MapAsString(m map[string]string) string {
-	minX, minY, maxX, maxY := GetMapMaxes(m)
-
+func MapAsString(m Map) string {
 	out := ""
-	for y := minY; y <= maxY; y++ {
-		for x := minX; x <= maxX; x++ {
-			s, found := m[IntKey(x, y)]
+	minC, maxC := GetMapMaxes(m)
+	for y := minC.Y; y <= maxC.Y; y++ {
+		for x := minC.X; x <= maxC.X; x++ {
+			s, found := m[Coord{x, y}]
 			if !found {
 				out += "."
 			} else {
