@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/chart"
 	"time"
 )
 
 func main() {
 	startTimer := time.Now()
-	inFile := GetFileContents("2023/13/input.txt", "\n")
+	inFile := util.GetFileContents("2023/13/input.txt", "\n")
 
-	m := make(Map)
+	m := make(Chart)
 	y := -1
 	part1 := 0
 	part2 := 0
@@ -19,7 +20,7 @@ func main() {
 			// analyze last pattern and start a new
 			part1 += analyze(m, 0)
 			part2 += analyze(m, 1)
-			m = make(Map)
+			m = make(Chart)
 			y = -1
 			continue
 		}
@@ -38,10 +39,10 @@ func main() {
 	fmt.Println("part2: ", part2, "in", time.Since(startTimer))
 }
 
-func analyze(m Map, nbrErrors int) int {
+func analyze(m Chart, nbrErrors int) int {
 	// test potential vertical mirrors
 	// between x and x+ (left to right)
-	minC, maxC := GetMapMaxes(m)
+	minC, maxC := GetChartMaxes(m)
 	for x := minC.X; x < maxC.X; x++ {
 		if isMirror(m, x, minC.X, minC.Y, maxC.X, maxC.Y, nbrErrors) {
 			return x + 1
@@ -51,7 +52,7 @@ func analyze(m Map, nbrErrors int) int {
 	// test potential horizontal mirrors by rotating the map counter clock wise
 	// between y and y+ (left to right, former top to bottom)
 	m = RotateCounterClockWise(m)
-	minC, maxC = GetMapMaxes(m)
+	minC, maxC = GetChartMaxes(m)
 	for x := minC.X; x < maxC.X; x++ {
 		if isMirror(m, x, minC.X, minC.Y, maxC.X, maxC.Y, nbrErrors) {
 			return 100 * (x + 1)
@@ -61,7 +62,7 @@ func analyze(m Map, nbrErrors int) int {
 	panic("ho ho")
 }
 
-func isMirror(m Map, mirror int, minX int, minY int, maxX int, maxY int, errors int) bool {
+func isMirror(m Chart, mirror int, minX int, minY int, maxX int, maxY int, errors int) bool {
 	// start with both sides of mirror
 	// walk outwards
 	mirroredX := mirror

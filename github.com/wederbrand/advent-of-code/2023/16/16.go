@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/chart"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/priorityqueue"
 	"math"
 	"time"
@@ -15,14 +16,14 @@ type Beam struct {
 
 func main() {
 	startTimer := time.Now()
-	inFile := GetFileContents("2023/16/input.txt", "\n")
-	m := MakeMap(inFile)
+	inFile := util.GetFileContents("2023/16/input.txt", "\n")
+	m := MakeChart(inFile)
 
-	start := Beam{Coord{0, 0}, RIGHT}
+	start := Beam{c: Coord{0, 0}, dir: RIGHT}
 	energized := doIt(m, start)
 	fmt.Println("part1: ", len(energized), "in", time.Since(startTimer))
 
-	minC, maxC := GetMapMaxes(m)
+	minC, maxC := GetChartMaxes(m)
 	part2 := math.MinInt
 	for x := minC.X; x < maxC.X; x++ {
 		start = Beam{Coord{x, minC.Y}, DOWN}
@@ -45,12 +46,12 @@ func main() {
 	fmt.Println("part2: ", part2, "in", time.Since(startTimer))
 }
 
-func doIt(m Map, start Beam) map[Coord]bool {
+func doIt(m Chart, start Beam) map[Coord]bool {
 	q := priorityqueue.NewQueue()
 	state := &priorityqueue.State{start, 0}
 	q.Add(state)
 
-	minC, maxC := GetMapMaxes(m)
+	minC, maxC := GetChartMaxes(m)
 
 	seen := make(map[Beam]bool)
 	energized := make(map[Coord]bool)
@@ -78,10 +79,8 @@ func doIt(m Map, start Beam) map[Coord]bool {
 		} else {
 			if tile == "-" {
 				if beam.dir == RIGHT || beam.dir == LEFT {
-					// if hitting pointy end do nothing
 					move(beam, beam.dir, q)
 				} else {
-					// if hitting flat end split and queue
 					move(beam, RIGHT, q)
 					move(beam, LEFT, q)
 				}

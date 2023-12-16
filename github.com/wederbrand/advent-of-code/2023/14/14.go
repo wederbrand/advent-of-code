@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/chart"
 	"time"
 )
 
 func main() {
 	startTimer := time.Now()
-	inFile := GetFileContents("2023/14/input.txt", "\n")
+	inFile := util.GetFileContents("2023/14/input.txt", "\n")
 
-	m := MakeMap(inFile)
+	m := MakeChart(inFile)
 
 	rollNorth(m)
 	part1 := getWeight(m)
@@ -24,7 +25,7 @@ func main() {
 			m = RotateClockWise(m)
 		}
 
-		s := MapAsString(m)
+		s := ChartAsString(m)
 		lastIndex, found := seen[s]
 		if found {
 			cycle := i - lastIndex
@@ -40,8 +41,8 @@ func main() {
 	fmt.Println("part2: ", part2, "in", time.Since(startTimer))
 }
 
-func getWeight(m Map) int {
-	_, maxC := GetMapMaxes(m)
+func getWeight(m Chart) int {
+	_, maxC := GetChartMaxes(m)
 	weight := 0
 	for key, rock := range m {
 		if rock == "O" {
@@ -51,8 +52,8 @@ func getWeight(m Map) int {
 	return weight
 }
 
-func rollNorth(m Map) {
-	minC, maxC := GetMapMaxes(m)
+func rollNorth(m Chart) {
+	minC, maxC := GetChartMaxes(m)
 	for y := minC.Y; y <= maxC.Y; y++ {
 		for x := minC.X; x <= maxC.X; x++ {
 			// roll forward until blocked
