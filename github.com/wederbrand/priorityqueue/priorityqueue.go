@@ -1,5 +1,10 @@
 package priorityqueue
 
+import (
+	"cmp"
+	"slices"
+)
+
 type State struct {
 	Data     interface{}
 	Priority int
@@ -17,21 +22,10 @@ func NewQueue() *Queue {
 }
 
 func (q *Queue) Add(s *State) {
-	// add State to Queue and sort it by priority
-	if len(q.states) == 0 {
-		q.states = append(q.states, s)
-	} else {
-		for i, s2 := range q.states {
-			if s.Priority < s2.Priority {
-				// insert here
-				q.states = append(q.states, nil)   // make room for copy
-				copy(q.states[i+1:], q.states[i:]) // make room at index i, overwriting the nil
-				q.states[i] = s                    // insert s
-				return
-			}
-		}
-		q.states = append(q.states, s)
-	}
+	search, _ := slices.BinarySearchFunc(q.states, s, func(s1 *State, s2 *State) int {
+		return cmp.Compare(s1.Priority, s2.Priority)
+	})
+	q.states = slices.Insert(q.states, search, s)
 }
 
 func (q *Queue) HasNext() bool {
