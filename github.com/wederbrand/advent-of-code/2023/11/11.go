@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	"github.com/wederbrand/advent-of-code/github.com/wederbrand/chart"
 	"time"
 )
 
@@ -48,7 +49,7 @@ func main() {
 		for b := range m {
 			ax, ay := util.DeKey(a)
 			bx, by := util.DeKey(b)
-			dist := util.Manhattan(ax, ay, bx, by)
+			dist := chart.Manhattan(chart.Coord{ax, ay}, chart.Coord{bx, by})
 			part2 += dist
 		}
 	}

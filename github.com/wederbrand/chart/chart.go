@@ -21,8 +21,12 @@ type Coord struct {
 	Y int
 }
 
-func (c Coord) Move(dir Dir) Coord {
-	return Coord{c.X + dir[0], c.Y + dir[1]}
+func (c Coord) Move(dir Dir, length ...int) Coord {
+	l := 1
+	if len(length) == 1 {
+		l = length[0]
+	}
+	return Coord{c.X + dir[0]*l, c.Y + dir[1]*l}
 }
 
 type Chart map[Coord]string
@@ -40,6 +44,10 @@ func MakeChart(in []string) Chart {
 	}
 
 	return m
+}
+
+func Manhattan(a Coord, b Coord) int {
+	return int(math.Abs(float64(a.X-b.X)) + math.Abs(float64(a.Y-b.Y)))
 }
 
 func RotateClockWise(in Chart) Chart {

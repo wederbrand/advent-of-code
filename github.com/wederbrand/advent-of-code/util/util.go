@@ -3,7 +3,6 @@ package util
 import (
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -126,10 +125,6 @@ func Key(a string, b string) string {
 func DeKey(key string) (a int, b int) {
 	split := strings.Split(key, "|")
 	return Atoi(split[0]), Atoi(split[1])
-}
-
-func Manhattan(ax int, ay int, bx int, by int) int {
-	return int(math.Abs(float64(ax-bx)) + math.Abs(float64(ay-by)))
 }
 
 func IntKey(x int, y int) string {
