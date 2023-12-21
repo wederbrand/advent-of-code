@@ -11,7 +11,7 @@ func main() {
 	startTimer := time.Now()
 	inFile := util.GetFileContents("2023/14/input.txt", "\n")
 
-	m := MakeChart(inFile)
+	m := MakeChart(inFile, ".")
 
 	rollNorth(m)
 	part1 := getWeight(m)

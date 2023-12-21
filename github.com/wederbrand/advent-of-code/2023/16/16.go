@@ -17,7 +17,7 @@ type Beam struct {
 func main() {
 	startTimer := time.Now()
 	inFile := util.GetFileContents("2023/16/input.txt", "\n")
-	m := MakeChart(inFile)
+	m := MakeChart(inFile, ".")
 
 	start := Beam{c: Coord{0, 0}, dir: RIGHT}
 	energized := doIt(m, start)

@@ -3,6 +3,7 @@ package chart
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 type Dir [2]int
@@ -31,12 +32,12 @@ func (c Coord) Move(dir Dir, length ...int) Coord {
 
 type Chart map[Coord]string
 
-func MakeChart(in []string) Chart {
+func MakeChart(in []string, ignored string) Chart {
 	m := make(map[Coord]string)
 
 	for y, s := range in {
 		for x, r := range s {
-			if r == '.' {
+			if strings.ContainsRune(ignored, r) {
 				continue
 			}
 			m[Coord{x, y}] = string(r)

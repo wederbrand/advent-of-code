@@ -55,7 +55,7 @@ func main() {
 	startTimer := time.Now()
 	inFile := util.GetFileContents("2023/17/input.txt", "\n")
 
-	m := MakeChart(inFile)
+	m := MakeChart(inFile, ".")
 	part1 := doIt(m, 1, 3)
 	fmt.Println("part1: ", part1, "in", time.Since(startTimer))
 	startTimer = time.Now()
