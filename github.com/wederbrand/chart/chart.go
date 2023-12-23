@@ -17,6 +17,38 @@ var RIGHT = Dir{+1, 0}
 var W = Dir{-1, 0}
 var LEFT = Dir{-1, 0}
 
+var ALL = [4]Dir{UP, RIGHT, DOWN, LEFT}
+
+func (d Dir) leftOf() Dir {
+	switch d {
+	case UP:
+		return LEFT
+	case LEFT:
+		return DOWN
+	case DOWN:
+		return RIGHT
+	case RIGHT:
+		return UP
+	default:
+		panic("hoho")
+	}
+}
+
+func (d Dir) rightOf() Dir {
+	switch d {
+	case UP:
+		return RIGHT
+	case LEFT:
+		return UP
+	case DOWN:
+		return LEFT
+	case RIGHT:
+		return DOWN
+	default:
+		panic("hoho")
+	}
+}
+
 type Coord struct {
 	X int
 	Y int
@@ -28,6 +60,25 @@ func (c Coord) Move(dir Dir, length ...int) Coord {
 		l = length[0]
 	}
 	return Coord{c.X + dir[0]*l, c.Y + dir[1]*l}
+}
+
+func (c Coord) AllBut(last Coord, m Chart, but string) ([]Coord, []string) {
+	out := make([]Coord, 0)
+	outString := make([]string, 0)
+	for _, dir := range ALL {
+		next := c.Move(dir)
+		if next == last {
+			continue
+		}
+		s2 := m[next]
+
+		if !strings.Contains(but, s2) {
+			out = append(out, next)
+			outString = append(outString, s2)
+		}
+	}
+
+	return out, outString
 }
 
 type Chart map[Coord]string
