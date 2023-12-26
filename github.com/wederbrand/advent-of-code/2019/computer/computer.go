@@ -7,8 +7,10 @@ import (
 )
 
 type Computer struct {
-	p int // conveniently defaults to 0
-	m []int
+	p   int // conveniently defaults to 0
+	m   []int
+	in  chan int
+	out chan int
 }
 
 func NewComputer(input []string) Computer {
@@ -17,7 +19,13 @@ func NewComputer(input []string) Computer {
 		result := util.MatchingNumbersAfterSplitOnAny(i, "", ",")
 		instructions = append(instructions, result[0]...)
 	}
-	return Computer{m: instructions}
+
+	return Computer{
+		p:   0,
+		m:   instructions,
+		in:  make(chan int),
+		out: make(chan int),
+	}
 }
 
 func (c *Computer) SetMemory(addr int, val int) {
@@ -28,18 +36,90 @@ func (c *Computer) GetMemory(addr int) int {
 	return c.m[addr]
 }
 
+func (c *Computer) SetInput(newChan chan int) {
+	c.in = newChan
+}
+
+func (c *Computer) GetInput() chan int {
+	return c.in
+}
+
+func (c *Computer) GetOutput() chan int {
+	return c.out
+}
+
 func (c *Computer) Run() {
 	for {
-		switch c.m[c.p] {
-		case 1:
-			c.m[c.m[c.p+3]] = c.m[c.m[c.p+1]] + c.m[c.m[c.p+2]]
+		if c.p >= len(c.m) {
+			panic("out of bounds instruction")
+		}
+
+		op := c.m[c.p] % 100
+		mode1 := (c.m[c.p] / 100) % 10
+		mode2 := (c.m[c.p] / 1000) % 10
+		// mode3 := (c.m[c.p] / 10000) % 100000
+		switch op {
+		case 1: // addition
+			c.m[c.m[c.p+3]] = c.GetValue(mode1, 1) + c.GetValue(mode2, 2)
 			c.p += 4
-		case 2:
-			c.m[c.m[c.p+3]] = c.m[c.m[c.p+1]] * c.m[c.m[c.p+2]]
+
+		case 2: // multiply
+			c.m[c.m[c.p+3]] = c.GetValue(mode1, 1) * c.GetValue(mode2, 2)
 			c.p += 4
+
+		case 3: // store input
+			c.m[c.m[c.p+1]] = <-c.in
+			c.p += 2
+
+		case 4: // return output
+			c.out <- c.GetValue(mode1, 1)
+			c.p += 2
+
+		case 5: // jump-if-true
+			value := c.GetValue(mode1, 1)
+			if value != 0 {
+				c.p = c.GetValue(mode2, 2)
+			} else {
+				c.p += 3
+			}
+
+		case 6: // jump-if-false
+			value := c.GetValue(mode1, 1)
+			if value == 0 {
+				c.p = c.GetValue(mode2, 2)
+			} else {
+				c.p += 3
+			}
+
+		case 7: // less than
+			value1 := c.GetValue(mode1, 1)
+			value2 := c.GetValue(mode2, 2)
+			if value1 < value2 {
+				c.m[c.m[c.p+3]] = 1
+			} else {
+				c.m[c.m[c.p+3]] = 0
+			}
+
+			c.p += 4
+
+		case 8: // equals
+			value1 := c.GetValue(mode1, 1)
+			value2 := c.GetValue(mode2, 2)
+			if value1 == value2 {
+				c.m[c.m[c.p+3]] = 1
+			} else {
+				c.m[c.m[c.p+3]] = 0
+			}
+
+			c.p += 4
+
 		case 99:
 			c.p += 1
+			close(c.in)
+			close(c.out)
 			return
+		default:
+			panic("invalid instruction")
 		}
 	}
 }
@@ -49,4 +129,14 @@ func (c *Computer) Print() {
 		fmt.Print(strconv.Itoa(i), " ")
 	}
 	fmt.Println()
+}
+
+func (c *Computer) GetValue(mode int, i int) int {
+	if mode == 0 {
+		return c.m[c.m[c.p+i]]
+	} else if mode == 1 {
+		return c.m[c.p+i]
+	}
+
+	panic("invalid mode")
 }
