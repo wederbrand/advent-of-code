@@ -7,10 +7,12 @@ import (
 )
 
 type Computer struct {
-	p   int // conveniently defaults to 0
-	m   []int
-	in  chan int
-	out chan int
+	Name    string
+	running bool
+	p       int // conveniently defaults to 0
+	m       []int
+	in      chan int
+	out     chan int
 }
 
 func NewComputer(input []string) Computer {
@@ -26,6 +28,10 @@ func NewComputer(input []string) Computer {
 		in:  make(chan int),
 		out: make(chan int),
 	}
+}
+
+func (c *Computer) IsRunning() bool {
+	return c.running
 }
 
 func (c *Computer) SetMemory(addr int, val int) {
@@ -49,9 +55,10 @@ func (c *Computer) GetOutput() chan int {
 }
 
 func (c *Computer) Run() {
+	c.running = true
 	for {
 		if c.p >= len(c.m) {
-			panic("out of bounds instruction")
+			panic(c.Name + " out of bounds instruction " + strconv.Itoa(c.p) + " " + strconv.Itoa(len(c.m)))
 		}
 
 		op := c.m[c.p] % 100
@@ -115,11 +122,11 @@ func (c *Computer) Run() {
 
 		case 99:
 			c.p += 1
-			close(c.in)
+			c.running = false
 			close(c.out)
 			return
 		default:
-			panic("invalid instruction")
+			panic(c.Name + " invalid instruction " + strconv.Itoa(op))
 		}
 	}
 }

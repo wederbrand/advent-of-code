@@ -38,7 +38,8 @@ public class Day07 {
 	}
 
 	public static int machineOfLoopingMachines(int a, int b, int c, int d, int e, String input) throws InterruptedException {
-return 0;	}
+		return 0;
+	}
 
 	public static int bestOfLoopingMachines(String input, int min, int max) throws InterruptedException {
 		List<int[]> permutations = getPermutations(min, max);
