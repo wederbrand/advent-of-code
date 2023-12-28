@@ -138,6 +138,15 @@ func FirstRune(s string) rune {
 	return 0
 }
 
+// IntAbs returns the absolut value
+func IntAbs(x int) int {
+	if x < 0 {
+		return -x
+	} else {
+		return x
+	}
+}
+
 // Gcd returns the greatest common divisor
 func Gcd(x, y int) int {
 	for y != 0 {
