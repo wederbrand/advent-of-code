@@ -28,6 +28,7 @@ func NewComputer(input []string) Computer {
 		relativeBase: 0,
 		in:           make(chan int),
 		out:          make(chan int),
+		running:      true,
 	}
 }
 

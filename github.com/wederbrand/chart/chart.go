@@ -19,7 +19,7 @@ var LEFT = Dir{-1, 0}
 
 var ALL = [4]Dir{UP, RIGHT, DOWN, LEFT}
 
-func (d Dir) leftOf() Dir {
+func (d Dir) Left() Dir {
 	switch d {
 	case UP:
 		return LEFT
@@ -34,7 +34,7 @@ func (d Dir) leftOf() Dir {
 	}
 }
 
-func (d Dir) rightOf() Dir {
+func (d Dir) Right() Dir {
 	switch d {
 	case UP:
 		return RIGHT
