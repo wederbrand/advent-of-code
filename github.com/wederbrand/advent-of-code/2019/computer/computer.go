@@ -12,11 +12,11 @@ type Computer struct {
 	p            int // conveniently defaults to 0
 	m            map[int]int
 	relativeBase int
-	in           chan int
-	out          chan int
+	in           func() int
+	out          func(int)
 }
 
-func NewComputer(input []string) Computer {
+func NewComputer(input []string, in func() int, out func(int)) Computer {
 	instructions := make(map[int]int)
 	for i, in := range util.MatchingNumbersAfterSplitOnAny(input[0], "", ",")[0] {
 		instructions[i] = in
@@ -26,8 +26,8 @@ func NewComputer(input []string) Computer {
 		p:            0,
 		m:            instructions,
 		relativeBase: 0,
-		in:           make(chan int),
-		out:          make(chan int),
+		in:           in,
+		out:          out,
 		running:      true,
 	}
 }
@@ -42,18 +42,6 @@ func (c *Computer) SetMemory(addr int, val int) {
 
 func (c *Computer) GetMemory(addr int) int {
 	return c.m[addr]
-}
-
-func (c *Computer) SetInput(newChan chan int) {
-	c.in = newChan
-}
-
-func (c *Computer) GetInput() chan int {
-	return c.in
-}
-
-func (c *Computer) GetOutput() chan int {
-	return c.out
 }
 
 func (c *Computer) Run() {
@@ -77,11 +65,11 @@ func (c *Computer) Run() {
 			c.p += 4
 
 		case 3: // store input
-			c.m[c.addr(mode1, 1)] = <-c.in
+			c.m[c.addr(mode1, 1)] = c.in()
 			c.p += 2
 
 		case 4: // return output
-			c.out <- c.m[c.addr(mode1, 1)]
+			c.out(c.m[c.addr(mode1, 1)])
 			c.p += 2
 
 		case 5: // jump-if-true
@@ -129,7 +117,6 @@ func (c *Computer) Run() {
 		case 99:
 			c.p += 1
 			c.running = false
-			close(c.out)
 			return
 		default:
 			panic(c.Name + " invalid instruction " + strconv.Itoa(op))
