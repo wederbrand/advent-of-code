@@ -10,14 +10,14 @@ import (
 func main() {
 	start := time.Now()
 	inFile := util.GetFileContents("2019/02/input.txt", "\n")
-	computer := NewComputer(inFile)
+	computer := NewComputer(inFile, nil, nil)
 
 	part1 := doIt(computer, 12, 2)
 	fmt.Println("part1: ", part1, "in", time.Since(start))
 
 	for i := 0; i < 100; i++ {
 		for j := 0; j < 100; j++ {
-			computer = NewComputer(inFile)
+			computer = NewComputer(inFile, nil, nil)
 			result := doIt(computer, i, j)
 			if result == 19690720 {
 				part2 := 100*i + j

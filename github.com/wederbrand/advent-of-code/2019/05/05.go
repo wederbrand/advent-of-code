@@ -10,18 +10,24 @@ import (
 func main() {
 	start := time.Now()
 	inFile := util.GetFileContents("2019/05/input.txt", "\n")
-	computer := NewComputer(inFile)
-	go computer.Run()
-	computer.GetInput() <- 1
-	out := 0
-	for i := range computer.GetOutput() {
-		out = i
-	}
-	fmt.Println("part1: ", out, "in", time.Since(start))
 
-	computer = NewComputer(inFile)
-	go computer.Run()
-	computer.GetInput() <- 5
-	out = <-computer.GetOutput()
-	fmt.Println("part2: ", out, "in", time.Since(start))
+	inFunc := func() int {
+		return 1
+	}
+
+	out := 0
+	outFunc := func(o int) {
+		out = o
+	}
+	computer := NewComputer(inFile, inFunc, outFunc)
+	computer.Run()
+	fmt.Println("part1: ", out, "inFunc", time.Since(start))
+
+	inFunc = func() int {
+		return 5
+	}
+
+	computer = NewComputer(inFile, inFunc, outFunc)
+	computer.Run()
+	fmt.Println("part2: ", out, "inFunc", time.Since(start))
 }
