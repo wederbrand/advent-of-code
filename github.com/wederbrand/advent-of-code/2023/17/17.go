@@ -21,36 +21,6 @@ type seenKey struct {
 	cnt int
 }
 
-func turnLeft(in Dir) Dir {
-	switch in {
-	case UP:
-		return LEFT
-	case LEFT:
-		return DOWN
-	case DOWN:
-		return RIGHT
-	case RIGHT:
-		return UP
-	}
-
-	panic("ho ho")
-}
-
-func turnRight(in Dir) Dir {
-	switch in {
-	case UP:
-		return RIGHT
-	case RIGHT:
-		return DOWN
-	case DOWN:
-		return LEFT
-	case LEFT:
-		return UP
-	}
-
-	panic("ho ho")
-}
-
 func main() {
 	startTimer := time.Now()
 	inFile := util.GetFileContents("2023/17/input.txt", "\n")
@@ -94,8 +64,8 @@ func doIt(m Chart, minStraight int, maxStraight int) int {
 			queueNext(c, c.last, c.same+1, m, q)
 		}
 		if c.same >= minStraight {
-			queueNext(c, turnLeft(c.last), 1, m, q)
-			queueNext(c, turnRight(c.last), 1, m, q)
+			queueNext(c, c.last.Left(), 1, m, q)
+			queueNext(c, c.last.Right(), 1, m, q)
 		}
 	}
 
