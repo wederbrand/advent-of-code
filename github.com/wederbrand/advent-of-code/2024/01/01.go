@@ -3,38 +3,38 @@ package main
 import (
 	"fmt"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
-	"github.com/wederbrand/advent-of-code/github.com/wederbrand/chart"
-	"math"
+	"slices"
 	"time"
 )
 
 func main() {
 	start := time.Now()
-	inFile := util.GetFileContents("2016/01/input.txt", ", ")
+	inFile := util.GetFileContents("2024/01/input.txt", "\n")
 
-	c := chart.Coord{0, 0}
-	d := chart.N
+	list1 := make([]int, 0)
+	list2 := make([]int, 0)
+	counts := make(map[int]int)
 
-	seen := make(map[chart.Coord]bool)
-	seen[c] = true
-	printed := false
 	for _, line := range inFile {
-		rotation := line[0]
-		steps := util.Atoi(line[1:])
-		if rotation == 'R' {
-			d = d.Right()
-		} else {
-			d = d.Left()
-		}
-		for i := 0; i < steps; i++ {
-			c = c.Move(d, 1)
-			if !printed && seen[c] {
-				fmt.Println("Part 2:", math.Abs(float64(c.X))+math.Abs(float64(c.Y)), "in", time.Since(start))
-				printed = true
-			}
-			seen[c] = true
-		}
+		var a, b int
+		fmt.Sscanf(line, "%d   %d", &a, &b)
+		list1 = append(list1, a)
+		list2 = append(list2, b)
+		counts[b]++
 	}
 
-	fmt.Println("Part 1:", math.Abs(float64(c.X))+math.Abs(float64(c.Y)), "in", time.Since(start))
+	slices.Sort(list1)
+	slices.Sort(list2)
+
+	part1 := 0
+	part2 := 0
+	for i := range list1 {
+		a := list1[i]
+		b := list2[i]
+		part1 += util.IntAbs(a - b)
+		part2 += a * counts[a]
+	}
+
+	fmt.Println("Part 1:", part1, "in", time.Since(start))
+	fmt.Println("Part 2:", part2, "in", time.Since(start))
 }
