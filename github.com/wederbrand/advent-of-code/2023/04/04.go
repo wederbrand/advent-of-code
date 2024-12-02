@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	"slices"
 	"time"
 )
 
@@ -25,7 +26,7 @@ func main() {
 		cnt := 0
 		nbrOfWins := 0
 		for _, i := range iHave {
-			if util.Contains(i, winningNumbers) {
+			if slices.Contains(winningNumbers, i) {
 				nbrOfWins++
 				if cnt == 0 {
 					cnt = 1
