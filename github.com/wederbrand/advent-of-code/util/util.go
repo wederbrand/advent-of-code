@@ -82,17 +82,6 @@ func MatchingNumbersAfterSplitOnAny(in string, splitOn string, separator string)
 	return
 }
 
-// Contains returns true if b contains a
-func Contains(a int, b []int) bool {
-	for _, i := range b {
-		if a == i {
-			return true
-		}
-	}
-
-	return false
-}
-
 // Permutations return all permutations of the input array
 func Permutations(arr []string) [][]string {
 	var helper func([]string, int)
@@ -190,4 +179,30 @@ func BinarySearch(start int, end int, fn func(int) bool) (last int, first int) {
 	}
 
 	return last, first
+}
+
+func CloneSlice[T any](in []T) (out []T) {
+	out = make([]T, len(in))
+	copy(out, in)
+	return
+}
+
+func CloneSliceKeep[T any](in []T, keep func(int, T) bool) (out []T) {
+	out = make([]T, 0)
+	for i, item := range in {
+		if keep(i, item) {
+			out = append(out, item)
+		}
+	}
+	return
+}
+
+func CloneSliceDelete[T any](in []T, delete func(int, T) bool) (out []T) {
+	out = make([]T, 0)
+	for i, item := range in {
+		if !delete(i, item) {
+			out = append(out, item)
+		}
+	}
+	return
 }
