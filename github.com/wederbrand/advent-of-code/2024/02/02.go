@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
-	"slices"
 	"strings"
 	"time"
 )
@@ -54,30 +53,27 @@ func part2(inFile []string) int {
 }
 
 func checkIt(split []string) bool {
-	values := make([]int, 0)
-	sorted := make([]int, 0)
-	for _, s := range split {
-		value := util.Atoi(s)
-		values = append(values, value)
-		sorted = append(sorted, value)
-	}
+	cntNeg := 0
+	cntPos := 0
 
-	slices.Sort(sorted)
+	for i := 1; i < len(split); i++ {
+		a := util.Atoi(split[i-1])
+		b := util.Atoi(split[i])
 
-	for i := 1; i < len(sorted); i++ {
-		diff := util.IntAbs(sorted[i] - sorted[i-1])
-		if diff < 1 || diff > 3 {
+		diff := a - b
+
+		if util.IntAbs(diff) < 1 || util.IntAbs(diff) > 3 {
 			return false
+		}
+
+		if diff < 0 {
+			cntNeg++
+		} else {
+			cntPos++
 		}
 	}
 
-	if slices.Equal(sorted, values) {
-		return true
-	}
-
-	slices.Reverse(sorted)
-
-	if slices.Equal(sorted, values) {
+	if cntNeg == 0 || cntPos == 0 {
 		return true
 	}
 
