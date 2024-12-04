@@ -9,15 +9,27 @@ import (
 type Dir [2]int
 
 var N = Dir{0, -1}
-var UP = Dir{0, -1}
 var S = Dir{0, +1}
-var DOWN = Dir{0, +1}
 var E = Dir{+1, 0}
-var RIGHT = Dir{+1, 0}
 var W = Dir{-1, 0}
+
+var NW = Dir{-1, -1}
+var NE = Dir{+1, -1}
+var SW = Dir{-1, +1}
+var SE = Dir{+1, +1}
+
+var UP = Dir{0, -1}
+var DOWN = Dir{0, +1}
+var RIGHT = Dir{+1, 0}
 var LEFT = Dir{-1, 0}
 
+var UPLEFT = Dir{-1, -1}
+var UPRIGHT = Dir{+1, -1}
+var DOWNLEFT = Dir{-1, +1}
+var DOWNRIGHT = Dir{+1, +1}
+
 var ALL = [4]Dir{UP, RIGHT, DOWN, LEFT}
+var ALL_AND_DIAG = [8]Dir{UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT}
 
 func (d Dir) Left() Dir {
 	switch d {
