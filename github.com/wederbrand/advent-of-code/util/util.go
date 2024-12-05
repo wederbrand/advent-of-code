@@ -83,13 +83,13 @@ func MatchingNumbersAfterSplitOnAny(in string, splitOn string, separator string)
 }
 
 // Permutations return all permutations of the input array
-func Permutations(arr []string) [][]string {
-	var helper func([]string, int)
-	var res [][]string
+func Permutations[T any](arr []T) [][]T {
+	var helper func([]T, int)
+	var res [][]T
 
-	helper = func(arr []string, n int) {
+	helper = func(arr []T, n int) {
 		if n == 1 {
-			tmp := make([]string, len(arr))
+			tmp := make([]T, len(arr))
 			copy(tmp, arr)
 			res = append(res, tmp)
 		} else {
