@@ -15,19 +15,23 @@ func main() {
 	_, startC := Find(m, "^")
 	minC, maxC := GetChartMaxes(m)
 
-	_, seen := doIt(m, minC, maxC, startC, UP)
+	_, seen := doIt(m, minC, maxC, startC, UP, nil)
 	fmt.Println("Part 1:", len(seen), "in", time.Since(start))
 
-	p2 := 0
-	for c, _ := range seen {
+	results := make(chan bool)
+	for c := range seen {
 		if m[c] != "#" {
-			m[c] = "#"
-			loop, _ := doIt(m, minC, maxC, startC, UP)
-			if loop {
-				p2++
-			}
-			// reset
-			delete(m, c)
+			go func(c Coord) {
+				loop, _ := doIt(m, minC, maxC, startC, UP, &c)
+				results <- loop
+			}(c)
+		}
+	}
+
+	p2 := 0
+	for range seen {
+		if <-results {
+			p2++
 		}
 	}
 
@@ -39,7 +43,7 @@ type CoordDir struct {
 	d Dir
 }
 
-func doIt(m Chart, minC Coord, maxC Coord, c Coord, d Dir) (bool, map[Coord]bool) {
+func doIt(m Chart, minC Coord, maxC Coord, c Coord, d Dir, alsoBlocked *Coord) (bool, map[Coord]bool) {
 	// walk until out of bounds
 	loop := make(map[CoordDir]bool)
 	seen := make(map[Coord]bool)
@@ -50,7 +54,7 @@ func doIt(m Chart, minC Coord, maxC Coord, c Coord, d Dir) (bool, map[Coord]bool
 		}
 		seen[c] = true
 		loop[CoordDir{c, d}] = true
-		if m[c.Move(d)] == "#" {
+		if m[c.Move(d)] == "#" || (alsoBlocked != nil && *alsoBlocked == c.Move(d)) {
 			d = d.Right()
 		} else {
 			c = c.Move(d)
