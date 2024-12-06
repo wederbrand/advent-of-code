@@ -154,6 +154,15 @@ func GetChartMaxes(m Chart) (minC Coord, maxC Coord) {
 	return Coord{minX, minY}, Coord{maxX, maxY}
 }
 
+func Find(m Chart, target string) (bool, Coord) {
+	for k, v := range m {
+		if v == target {
+			return true, k
+		}
+	}
+	return false, Coord{0, 0}
+}
+
 func PrintChart(m Chart) {
 	minC, maxC := GetChartMaxes(m)
 	for y := minC.Y; y <= maxC.Y; y++ {
