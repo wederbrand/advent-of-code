@@ -96,7 +96,7 @@ func (c Coord) AllBut(last Coord, m Chart, but string) ([]Coord, []string) {
 type Chart map[Coord]string
 
 func MakeChart(in []string, ignored string) Chart {
-	m := make(map[Coord]string)
+	m := make(Chart)
 
 	for y, s := range in {
 		for x, r := range s {
