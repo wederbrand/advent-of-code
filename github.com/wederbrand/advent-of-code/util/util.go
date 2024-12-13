@@ -145,7 +145,6 @@ func Gcd(x, y int) int {
 }
 
 // Lcd returns the Least Common Denominator
-// Lcd returns the Least Common Denominator
 func Lcd(numbers []int) int {
 	// initialize least common denominator to the first number in the slice
 	lcd := numbers[0]
@@ -205,4 +204,36 @@ func CloneSliceDelete[T any](in []T, delete func(int, T) bool) (out []T) {
 		}
 	}
 	return
+}
+
+// Equation represents a linear equation in the form of a*x + b*y = c
+type Equation struct {
+	A int
+	B int
+	C int
+}
+
+// WikiCramer solves a system of linear equations using Cramer's rule
+// the equations are in the form of:
+// a1*x + b1*y = c1 (as the type Equation)
+// a2*x + b2*y = c2 (as the type Equation)
+func WikiCramer(one Equation, two Equation) (x int, y int, err error) {
+	a1, b1, c1 := one.A, one.B, one.C
+	a2, b2, c2 := two.A, two.B, two.C
+
+	determinant := a1*b2 - a2*b1
+	if determinant == 0 {
+		return 0, 0, fmt.Errorf("cramer hates zeroes")
+	}
+
+	isXInteger := (c1*b2-b1*c2)%determinant == 0
+	isYInteger := (a1*c2-c1*a2)%determinant == 0
+	if !isXInteger || !isYInteger {
+		return 0, 0, fmt.Errorf("the formula assumes floats, forcing integer division loses some precision, detected here")
+	}
+
+	x = (c1*b2 - b1*c2) / determinant
+	y = (a1*c2 - c1*a2) / determinant
+
+	return x, y, nil
 }
