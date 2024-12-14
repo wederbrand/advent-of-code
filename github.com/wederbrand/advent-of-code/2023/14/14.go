@@ -25,7 +25,7 @@ func main() {
 			m = RotateClockWise(m)
 		}
 
-		s := ChartAsString(m)
+		s := AsString(m)
 		lastIndex, found := seen[s]
 		if found {
 			cycle := i - lastIndex
