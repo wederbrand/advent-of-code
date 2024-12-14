@@ -181,7 +181,7 @@ func PrintChart(m Chart) {
 	fmt.Println()
 }
 
-func ChartAsString(m Chart) string {
+func AsString(m Chart) string {
 	out := ""
 	minC, maxC := GetChartMaxes(m)
 	for y := minC.Y; y <= maxC.Y; y++ {
@@ -197,4 +197,19 @@ func ChartAsString(m Chart) string {
 	}
 
 	return out
+}
+
+func FromString(in string) Chart {
+	c := make(Chart)
+
+	lines := strings.Split(in, "|")
+	for y, s := range lines {
+		for x, r := range s {
+			if r != '.' {
+				c[Coord{x, y}] = string(r)
+			}
+		}
+	}
+
+	return c
 }
