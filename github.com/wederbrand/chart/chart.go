@@ -181,6 +181,14 @@ func PrintChart(m Chart) {
 	fmt.Println()
 }
 
+func CopyChart(m Chart) Chart {
+	out := make(Chart)
+	for k, v := range m {
+		out[k] = v
+	}
+	return out
+}
+
 func AsString(m Chart) string {
 	out := ""
 	minC, maxC := GetChartMaxes(m)
