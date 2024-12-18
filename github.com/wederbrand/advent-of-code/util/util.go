@@ -157,12 +157,14 @@ func Lcd(numbers []int) int {
 	return lcd
 }
 
+// BinarySearch takes a start and end value to run a binary search on
+// the returned values is the last value that still produces false and the first value that produces true
 func BinarySearch(start int, end int, fn func(int) bool) (last int, first int) {
 	if fn(start) {
 		panic("the start value must produce false")
 	}
 	if !fn(end) {
-		panic("the end value must produce false")
+		panic("the end value must produce true")
 	}
 
 	last = start // last that still produces false
