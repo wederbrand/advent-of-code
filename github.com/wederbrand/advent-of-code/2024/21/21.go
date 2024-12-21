@@ -69,35 +69,28 @@ func main() {
 }
 
 func getPathsBetweenButtons(s Coord, t Coord) []string {
-	cacheKey := pathCacheKey{s, t}
-	path, ok := pathCache[cacheKey]
-	if ok {
-		return path
-	}
-
 	if s == t {
 		return []string{"A"}
 	}
 
-func getPathsBetweenNumbers(s Coord, t Coord) []string {
 	dX := t.X - s.X
 	dY := t.Y - s.Y
 
-	movements := []string{}
+	var movements []Dir
 	for dX < 0 {
-		movements = append(movements, "<")
+		movements = append(movements, LEFT)
 		dX++
 	}
 	for dX > 0 {
-		movements = append(movements, ">")
+		movements = append(movements, RIGHT)
 		dX--
 	}
 	for dY < 0 {
-		movements = append(movements, "^")
+		movements = append(movements, UP)
 		dY++
 	}
 	for dY > 0 {
-		movements = append(movements, "v")
+		movements = append(movements, DOWN)
 		dY--
 	}
 
@@ -105,37 +98,23 @@ func getPathsBetweenNumbers(s Coord, t Coord) []string {
 
 	// de-duplicate and stringify
 	result := make(map[string]bool)
-outer:
 	for _, p := range permutations {
 		movement := ""
 		curr := s
-		for _, r := range p {
-			// TODO: check the avoid-box here
-			movement += r
+		illegal := false
+		for _, d := range p {
+			movement += d.ToArrowString()
+			curr = curr.Move(d)
 
-			if r == "<" {
-				curr = curr.Move(LEFT)
-			}
-			if r == ">" {
-				curr = curr.Move(RIGHT)
-			}
-			if r == "^" {
-				curr = curr.Move(UP)
-			}
-			if r == "v" {
-				curr = curr.Move(DOWN)
-			}
-
-			if curr == numbers["X"] {
-				// illegal move
-				continue outer
+			if curr == pad["X"] {
+				illegal = true
 			}
 		}
-		result[movement+"A"] = true
+		if !illegal {
+			result[movement+"A"] = true
+		}
 	}
-	if len(result) == 0 {
-		return []string{"A"}
-	}
+
 	return Keys(result)
 }
 
@@ -150,12 +129,12 @@ func minPresses(path string, levelsLeft int) int {
 		return len(path)
 	}
 
-	slutSvaret := 0
-	current := arrows["A"]
+	pushes := 0
+	current := pad["A"]
 	for i := 0; i < len(path); i++ {
-		next := arrows[string(path[i])]
+		next := pad[string(path[i])]
 
-		allPathsBetweenArrows := getPathsBetweenNumbers(current, next)
+		paths := getPathsBetweenButtons(current, next)
 
 		minPushes := math.MaxInt
 		for _, s := range paths {
@@ -165,9 +144,9 @@ func minPresses(path string, levelsLeft int) int {
 			}
 		}
 		current = next
-		slutSvaret += minsta
+		pushes += minPushes
 	}
 
-	cache[key] = slutSvaret
-	return slutSvaret
+	cache[cacheKey] = pushes
+	return pushes
 }

@@ -61,6 +61,21 @@ func (d Dir) Right() Dir {
 	}
 }
 
+func (d Dir) ToArrowString() string {
+	switch d {
+	case UP:
+		return "^"
+	case LEFT:
+		return "<"
+	case DOWN:
+		return "v"
+	case RIGHT:
+		return ">"
+	default:
+		panic("hoho")
+	}
+}
+
 type Coord struct {
 	X int
 	Y int

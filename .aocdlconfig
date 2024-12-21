@@ -1,0 +1,4 @@
+{
+    "session-cookie": "53616c7465645f5f1ff5903a26710181fa2976a997eda8242225c92ba28a0795b0083be42ebc1f01fe9690db03509823f386d180ee936074256548b327e7bc01",
+    "output": "github.com/wederbrand/advent-of-code/{{.Year}}/{{printf \"%02d\" .Day}}/input.txt"
+}
