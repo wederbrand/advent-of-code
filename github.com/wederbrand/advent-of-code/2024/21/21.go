@@ -69,6 +69,12 @@ func main() {
 }
 
 func getPathsBetweenButtons(s Coord, t Coord) []string {
+	cacheKey := pathCacheKey{s, t}
+	path, ok := pathCache[cacheKey]
+	if ok {
+		return path
+	}
+
 	if s == t {
 		return []string{"A"}
 	}
@@ -115,6 +121,7 @@ func getPathsBetweenButtons(s Coord, t Coord) []string {
 		}
 	}
 
+	pathCache[cacheKey] = Keys(result)
 	return Keys(result)
 }
 
@@ -147,6 +154,6 @@ func minPresses(path string, levelsLeft int) int {
 		pushes += minPushes
 	}
 
-	cache[cacheKey] = pushes
+	keyPressCache[cacheKey] = pushes
 	return pushes
 }
