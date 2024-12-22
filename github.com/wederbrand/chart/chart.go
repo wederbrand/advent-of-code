@@ -91,6 +91,32 @@ func (c Coord) Move(dir Dir, length ...int) Coord {
 	return Coord{c.X + dir[0]*l, c.Y + dir[1]*l}
 }
 
+func (c Coord) DirectionTo(target Coord) Dir {
+	dx := target.X - c.X
+	dy := target.Y - c.Y
+
+	switch {
+	case dx > 0 && dy == 0:
+		return RIGHT
+	case dx < 0 && dy == 0:
+		return LEFT
+	case dx == 0 && dy > 0:
+		return DOWN
+	case dx == 0 && dy < 0:
+		return UP
+	case dx > 0 && dy > 0:
+		return DOWNRIGHT
+	case dx > 0 && dy < 0:
+		return UPRIGHT
+	case dx < 0 && dy > 0:
+		return DOWNLEFT
+	case dx < 0 && dy < 0:
+		return UPLEFT
+	default:
+		panic("invalid direction")
+	}
+}
+
 func (c Coord) AllBut(last Coord, m Chart, but string) ([]Coord, []string) {
 	out := make([]Coord, 0)
 	outString := make([]string, 0)
