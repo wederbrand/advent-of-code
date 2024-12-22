@@ -7,12 +7,16 @@ import (
 	"time"
 )
 
+type DiffKey struct {
+	d0, d1, d2, d3 int
+}
+
 func main() {
 	start := time.Now()
 	inFile := GetFileContents("2024/22/input.txt", "\n")
 
 	part1 := 0
-	all := make(map[string]int)
+	all := make(map[DiffKey]int)
 	for _, line := range inFile {
 		secret := Atoi(line)
 		d0, d1, d2, d3 := 0, 0, 0, 0
@@ -23,12 +27,13 @@ func main() {
 			digit := secret % 10
 			d0, d1, d2, d3 = d1, d2, d3, digit-last
 			if j >= 3 {
-				lastFourString := fmt.Sprintf("%d,%d,%d,%d", d1-d0, d2-d1, d3-d2, d4-d3)
-				if !seen[lastFourString] {
-					all[lastFourString] += digit
-					seen[lastFourString] = true
+				diffKey := DiffKey{d0, d1, d2, d3}
+				if !seen[diffKey] {
+					all[diffKey] += digit
+					seen[diffKey] = true
 				}
 			}
+			last = digit
 		}
 		part1 += secret
 	}
