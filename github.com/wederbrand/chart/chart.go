@@ -2,7 +2,9 @@ package chart
 
 import (
 	"fmt"
+	"github.com/wederbrand/advent-of-code/github.com/wederbrand/priorityqueue"
 	"math"
+	"slices"
 	"strings"
 )
 
@@ -109,6 +111,84 @@ func (c Coord) AllBut(last Coord, m Chart, but string) ([]Coord, []string) {
 }
 
 type Chart map[Coord]string
+
+func (m Chart) FindLetter(letter string) Coord {
+	for coord, s := range m {
+		if s == letter {
+			return coord
+		}
+	}
+
+	panic("letter not found")
+}
+
+type PathState struct {
+	current Coord
+	path    []Coord
+}
+
+// GetPath returns the first path leading from the start to the end
+// The path consists of a slice of Coords
+// If there are multiple paths use GetAllPaths instead
+func (m Chart) GetPath(start Coord, end Coord) []Coord {
+	ch := make(chan []Coord)
+	go m.GetAllPaths(ch, start, end, false)
+	return <-ch
+}
+
+// GetAllPaths returns all paths leading from the start to the end on the given channel
+// The paths consist of a slice of Coords
+// # and Coords outside the map is treated as walls
+// setting exhaustive to true will make the search continue even if a path has been found
+// If there is exactly one path it's faster to set exhaustive to false, or use GetPath
+func (m Chart) GetAllPaths(outChan chan []Coord, start Coord, end Coord, exhaustive bool) {
+	q := priorityqueue.NewQueue()
+	q.Add(&priorityqueue.State{Data: PathState{current: start, path: []Coord{start}}})
+
+	seen := make(map[Coord]int)
+
+	for q.HasNext() {
+		s := q.Next()
+		ps := s.Data.(PathState)
+		c := ps.current
+
+		if c == end {
+			outChan <- ps.path
+			continue
+		}
+
+		for _, dir := range ALL {
+			next := c.Move(dir)
+
+			if slices.Contains(ps.path, next) {
+				// we have been here before
+				continue
+			}
+
+			if m[next] == "#" || m[next] == "" { // blocked by wall or outside the map
+				continue
+			}
+
+			newPath := make([]Coord, len(ps.path))
+			copy(newPath, ps.path)
+			newPath = append(newPath, next)
+
+			nextState := priorityqueue.State{Data: PathState{current: next, path: newPath}, Priority: s.Priority + 1}
+
+			oldValue, found := seen[next]
+			if !exhaustive && found && oldValue < s.Priority {
+				// we have been here before and it was a shorter path
+				continue
+			}
+
+			seen[c] = s.Priority
+
+			q.Add(&nextState)
+		}
+	}
+
+	close(outChan)
+}
 
 func MakeChart(in []string, ignored string) Chart {
 	m := make(Chart)

@@ -13,19 +13,10 @@ func main() {
 
 	m := MakeChart(inFile, "")
 
-	var startCoord Coord
-	var endCoord Coord
-	for coord, s := range m {
-		if s == "S" {
-			startCoord = coord
-		}
-		if s == "E" {
-			endCoord = coord
-		}
-	}
+	startCoord := m.FindLetter("S")
+	endCoord := m.FindLetter("E")
 
-	// first get the normal path
-	longest := pathIt(m, startCoord, endCoord)
+	longest := m.GetPath(startCoord, endCoord)
 
 	saves := findSavedPathLengths(longest, 2)
 	part1 := 0
@@ -64,24 +55,4 @@ func findSavedPathLengths(longest []Coord, cheatDistance int) []int {
 	}
 
 	return saves
-}
-
-func pathIt(m Chart, s Coord, e Coord) []Coord {
-	path := make([]Coord, 0)
-	path = append(path, s)
-
-	for {
-		for _, dir := range ALL {
-			next := s.Move(dir)
-			if next == e {
-				path = append(path, next)
-				return path
-			}
-			if m[next] == "." && (len(path) < 2 || next != path[len(path)-2]) {
-				path = append(path, next)
-				s = next
-				break
-			}
-		}
-	}
 }
