@@ -3,6 +3,7 @@ module github.com/wederbrand/advent-of-code
 go 1.23.3
 
 require (
+	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/gdamore/tcell v1.4.0
