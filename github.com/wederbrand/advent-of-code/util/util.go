@@ -182,6 +182,14 @@ func BinarySearch(start int, end int, fn func(int) bool) (last int, first int) {
 	return last, first
 }
 
+func CloneMap[T any](original map[string]T) map[string]T {
+	out := make(map[string]T)
+	for key, value := range original {
+		out[key] = value
+	}
+	return out
+}
+
 func CloneSlice[T any](in []T) (out []T) {
 	out = make([]T, len(in))
 	copy(out, in)
