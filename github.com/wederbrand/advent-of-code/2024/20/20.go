@@ -13,8 +13,8 @@ func main() {
 
 	m := MakeChart(inFile, "")
 
-	startCoord := m.FindLetter("S")
-	endCoord := m.FindLetter("E")
+	startCoord, _ := m.FindLetter("S")
+	endCoord, _ := m.FindLetter("E")
 
 	longest := m.GetPath(startCoord, endCoord)
 

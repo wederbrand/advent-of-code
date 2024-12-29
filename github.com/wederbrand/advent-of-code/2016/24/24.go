@@ -3,102 +3,73 @@ package main
 import (
 	"fmt"
 	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
+	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/chart"
+	"math"
 	"strconv"
-	"strings"
 	"time"
 )
 
 func main() {
 	start := time.Now()
-	inFile := GetFileContents("2016/23/input.txt", "\n")
+	inFile := GetFileContents("2016/24/input.txt", "\n")
 
-	instructions := make([]string, 0)
-	for _, line := range inFile {
-		instructions = append(instructions, line)
+	m := MakeChart(inFile, "")
+
+	numbers := make([]Coord, 0)
+	for i := 1; ; i++ {
+		letter, err := m.FindLetter(strconv.Itoa(i))
+		if err != nil {
+			break
+		}
+		numbers = append(numbers, letter)
 	}
 
-	registers := make(map[string]int)
-	registers["a"] = 12
-	doIt(instructions, registers)
-	fmt.Println("Part 1: ", registers["a"], "in", time.Since(start))
+	zero, _ := m.FindLetter("0")
 
-	// registers = make(map[string]int)
-	// registers["c"] = 1
-	// doIt(instructions, registers)
-	// fmt.Println("Part 2: ", registers["a"], "in", time.Since(start))
+	part1 := doIt(numbers, m, zero, false)
+	fmt.Println("Part 1: ", part1, "in", time.Since(start))
+
+	part2 := doIt(numbers, m, zero, true)
+	fmt.Println("Part 2: ", part2, "in", time.Since(start))
+
+	fmt.Println("Cache hits:", cacheHits)
+	fmt.Println("Cache misses:", cacheMisses)
 }
 
-func doIt(instructions []string, registers map[string]int) {
-	pointer := 0
-	for pointer < len(instructions) {
-		instruction := instructions[pointer]
-		split := strings.Split(instruction, " ")
-		switch split[0] {
-		case "cpy":
-			value, err := strconv.Atoi(split[1])
-			if err != nil {
-				value = registers[split[1]]
-			}
-			if _, err := strconv.Atoi(split[2]); err == nil {
-				// split[2] is a number and we can't copy to a number
-				pointer++
-				continue
-			}
-			registers[split[2]] = value
-			pointer++
-		case "inc":
-			registers[split[1]]++
-			pointer++
-		case "dec":
-			registers[split[1]]--
-			pointer++
-		case "jnz":
-			value, err := strconv.Atoi(split[1])
-			if err != nil {
-				value = registers[split[1]]
-			}
-			if value != 0 {
-				value2, err := strconv.Atoi(split[2])
-				if err != nil {
-					value2 = registers[split[2]]
-				}
-
-				pointer += value2
+func doIt(numbers []Coord, m Chart, zero Coord, returnHome bool) int {
+	permutations := Permutations(numbers)
+	lowest := math.MaxInt
+	for _, permutation := range permutations {
+		sum := 0
+		for i := 0; i < len(permutation); i++ {
+			if i == 0 {
+				sum += walkItCached(m, zero, permutation[i])
 			} else {
-				pointer++
+				sum += walkItCached(m, permutation[i-1], permutation[i])
 			}
-		case "tgl":
-			value, err := strconv.Atoi(split[1])
-			if err != nil {
-				value = registers[split[1]]
+			if i == len(permutation)-1 && returnHome {
+				sum += walkItCached(m, permutation[i], zero)
 			}
+		}
 
-			if pointer+value >= len(instructions) {
-				pointer++
-				continue
-			}
-			inst := instructions[pointer+value]
-			args := strings.Split(inst, " ")
-			if len(args) == 2 {
-				// one argument
-				if args[0] == "inc" {
-					instructions[pointer+value] = "dec " + args[1]
-				} else {
-					instructions[pointer+value] = "inc " + args[1]
-				}
-			} else if len(args) == 3 {
-				// two arguments
-				if args[0] == "jnz" {
-					instructions[pointer+value] = "cpy " + args[1] + " " + args[2]
-				} else {
-					instructions[pointer+value] = "jnz " + args[1] + " " + args[2]
-				}
-			} else {
-				panic("Unknown instruction")
-			}
-			pointer++
-		default:
-			panic("Unknown instruction")
+		if sum < lowest {
+			lowest = sum
 		}
 	}
+	return lowest
+}
+
+var cache = make(map[[2]Coord]int)
+var cacheHits = 0
+var cacheMisses = 0
+
+func walkItCached(m Chart, a Coord, b Coord) int {
+	if val, ok := cache[[2]Coord{a, b}]; ok {
+		cacheHits++
+		return val
+	}
+	cacheMisses++
+	length := m.GetPathLength(a, b)
+	cache[[2]Coord{a, b}] = length
+	return length
 }

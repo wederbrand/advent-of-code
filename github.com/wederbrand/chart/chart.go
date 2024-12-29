@@ -112,19 +112,52 @@ func (c Coord) AllBut(last Coord, m Chart, but string) ([]Coord, []string) {
 
 type Chart map[Coord]string
 
-func (m Chart) FindLetter(letter string) Coord {
+func (m Chart) FindLetter(letter string) (Coord, error) {
 	for coord, s := range m {
 		if s == letter {
-			return coord
+			return coord, nil
 		}
 	}
 
-	panic("letter not found")
+	return Coord{}, fmt.Errorf("Letter %s not found", letter)
 }
 
 type PathState struct {
 	current Coord
 	path    []Coord
+}
+
+// GetPathLength returns the length of the shortest path from start to end
+// note that the empty squares can't be skipped
+// # and Coords outside the map is treated as walls
+func (m Chart) GetPathLength(start Coord, end Coord) int {
+	q := priorityqueue.NewQueue()
+	q.Add(&priorityqueue.State{Data: start, Priority: 0})
+
+	seen := make(map[Coord]bool)
+	for q.HasNext() {
+		s := q.Next()
+		c := s.Data.(Coord)
+		if c == end {
+			return s.Priority
+		}
+
+		if seen[c] {
+			continue
+		}
+		seen[c] = true
+
+		for _, dir := range ALL {
+			next := c.Move(dir)
+			val, found := m[next]
+			if !found || val == "#" {
+				continue
+			}
+			q.Add(&priorityqueue.State{Data: next, Priority: s.Priority + 1})
+		}
+	}
+
+	return -1
 }
 
 // GetPath returns the first path leading from the start to the end
@@ -133,11 +166,13 @@ type PathState struct {
 func (m Chart) GetPath(start Coord, end Coord) []Coord {
 	ch := make(chan []Coord)
 	go m.GetAllPaths(ch, start, end, false)
-	return <-ch
+	p := <-ch
+	return p
 }
 
 // GetAllPaths returns all paths leading from the start to the end on the given channel
 // The paths consist of a slice of Coords
+// note that the empty squares can't be skipped
 // # and Coords outside the map is treated as walls
 // setting exhaustive to true will make the search continue even if a path has been found
 // If there is exactly one path it's faster to set exhaustive to false, or use GetPath
