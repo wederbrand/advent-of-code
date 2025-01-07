@@ -82,6 +82,25 @@ func MatchingNumbersAfterSplitOnAny(in string, splitOn string, separator string)
 	return
 }
 
+// Combinations returns all combinations of the input array
+func Combinations[T any](arr []T) [][]T {
+	var helper func([]T, int, int)
+	var res [][]T
+
+	helper = func(arr []T, n int, start int) {
+		tmp := make([]T, len(arr))
+		copy(tmp, arr)
+		res = append(res, tmp[:n])
+		for i := start; i < len(arr); i++ {
+			arr[n], arr[i] = arr[i], arr[n]
+			helper(arr, n+1, i+1)
+			arr[n], arr[i] = arr[i], arr[n]
+		}
+	}
+	helper(arr, 0, 0)
+	return res
+}
+
 // Permutations return all permutations of the input array
 func Permutations[T any](arr []T) [][]T {
 	var helper func([]T, int)

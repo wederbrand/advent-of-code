@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/gdamore/tcell v1.4.0
+	github.com/mowshon/iterium v1.0.0
 	github.com/tebeka/deque v0.1.2
 	golang.org/x/exp v0.0.0-20231219180239-dc181d75b848
 )
@@ -27,5 +28,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/sync v0.9.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/text v0.14.0 // indirect
 )
