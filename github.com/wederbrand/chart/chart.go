@@ -30,7 +30,7 @@ var UPRIGHT = Dir{+1, -1}
 var DOWNLEFT = Dir{-1, +1}
 var DOWNRIGHT = Dir{+1, +1}
 
-var ALL = [4]Dir{UP, RIGHT, DOWN, LEFT}
+var ALL = [4]Dir{UP, LEFT, RIGHT, DOWN}
 var ALL_AND_DIAG = [8]Dir{UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT}
 
 func (d Dir) Left() Dir {
@@ -123,8 +123,8 @@ func (m Chart) FindLetter(letter string) (Coord, error) {
 }
 
 type PathState struct {
-	current Coord
-	path    []Coord
+	Current Coord
+	Path    []Coord
 }
 
 // GetPathLength returns the length of the shortest path from start to end
@@ -178,24 +178,24 @@ func (m Chart) GetPath(start Coord, end Coord) []Coord {
 // If there is exactly one path it's faster to set exhaustive to false, or use GetPath
 func (m Chart) GetAllPaths(outChan chan []Coord, start Coord, end Coord, exhaustive bool) {
 	q := priorityqueue.NewQueue()
-	q.Add(&priorityqueue.State{Data: PathState{current: start, path: []Coord{start}}})
+	q.Add(&priorityqueue.State{Data: PathState{Current: start, Path: []Coord{start}}})
 
 	seen := make(map[Coord]int)
 
 	for q.HasNext() {
 		s := q.Next()
 		ps := s.Data.(PathState)
-		c := ps.current
+		c := ps.Current
 
 		if c == end {
-			outChan <- ps.path
+			outChan <- ps.Path
 			continue
 		}
 
 		for _, dir := range ALL {
 			next := c.Move(dir)
 
-			if slices.Contains(ps.path, next) {
+			if slices.Contains(ps.Path, next) {
 				// we have been here before
 				continue
 			}
@@ -204,11 +204,11 @@ func (m Chart) GetAllPaths(outChan chan []Coord, start Coord, end Coord, exhaust
 				continue
 			}
 
-			newPath := make([]Coord, len(ps.path))
-			copy(newPath, ps.path)
+			newPath := make([]Coord, len(ps.Path))
+			copy(newPath, ps.Path)
 			newPath = append(newPath, next)
 
-			nextState := priorityqueue.State{Data: PathState{current: next, path: newPath}, Priority: s.Priority + 1}
+			nextState := priorityqueue.State{Data: PathState{Current: next, Path: newPath}, Priority: s.Priority + 1}
 
 			oldValue, found := seen[next]
 			if !exhaustive && found && oldValue < s.Priority {

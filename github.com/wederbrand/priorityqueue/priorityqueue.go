@@ -23,6 +23,9 @@ func NewQueue() *Queue {
 
 func (q *Queue) Add(s *State) {
 	search, _ := slices.BinarySearchFunc(q.states, s, func(s1 *State, s2 *State) int {
+		if cmp.Compare(s1.Priority, s2.Priority) == 0 {
+			return -1 // maintain insert order if priorities are identical
+		}
 		return cmp.Compare(s1.Priority, s2.Priority)
 	})
 	q.states = slices.Insert(q.states, search, s)
