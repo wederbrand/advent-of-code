@@ -33,6 +33,21 @@ var DOWNRIGHT = Dir{+1, +1}
 var ALL = [4]Dir{UP, LEFT, RIGHT, DOWN}
 var ALL_AND_DIAG = [8]Dir{UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT}
 
+func FromCompassChar(r uint8) Dir {
+	switch r {
+	case 'N':
+		return N
+	case 'S':
+		return S
+	case 'E':
+		return E
+	case 'W':
+		return W
+	default:
+		panic("hoho")
+	}
+}
+
 func (d Dir) Left() Dir {
 	switch d {
 	case UP:
