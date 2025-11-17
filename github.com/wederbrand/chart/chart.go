@@ -2,10 +2,11 @@ package chart
 
 import (
 	"fmt"
-	"github.com/wederbrand/advent-of-code/github.com/wederbrand/priorityqueue"
 	"math"
 	"slices"
 	"strings"
+
+	"github.com/wederbrand/advent-of-code/github.com/wederbrand/priorityqueue"
 )
 
 type Dir [2]int
@@ -96,6 +97,11 @@ func (d Dir) ToArrowString() string {
 type Coord struct {
 	X int
 	Y int
+}
+
+// this is used only to render a debug friendly string, automatically used by intellij
+func (c Coord) String() string {
+	return fmt.Sprintf("(%d,%d) -> ", c.X, c.Y)
 }
 
 func (c Coord) Move(dir Dir, length ...int) Coord {
