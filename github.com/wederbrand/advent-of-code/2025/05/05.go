@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"slices"
+	"maps"
+	"sort"
 	"strings"
 	"time"
 
@@ -42,35 +43,49 @@ func main() {
 	}
 	fmt.Println("Part 1:", part1, "in", time.Since(start))
 
-	// sort the ranges
-	slices.SortFunc(ranges, func(a, b []int) int {
-		return a[0] - b[0]
-	})
-
-	// merge overlapping ranges
-	for i := range ranges {
-		if i == 0 {
-			continue
-		}
-
-		if ranges[i][0] <= ranges[i-1][1] {
-			// merge into the second one
-			ranges[i][0] = min(ranges[i-1][0], ranges[i][0])
-			ranges[i][1] = max(ranges[i-1][1], ranges[i][1])
-			// mark the first for deletion
-			ranges[i-1] = []int{-1, -1}
-		}
+	var all = make(map[int]bool)
+	for _, r := range ranges {
+		all[r[0]] = true
+		all[r[1]] = true
 	}
+
+	keys := []int{}
+	for k := range maps.Keys(all) {
+		keys = append(keys, k)
+	}
+
+	sort.Ints(keys)
 
 	part2 := 0
-	// count the remaining range
-	for _, r := range ranges {
-		if r[0] == -1 {
-			continue
+	in := false
+	entry := 0
+	for _, i := range keys {
+		if in {
+			// in - look for an exit
+			found := false
+			for _, r := range ranges {
+				if i+1 >= r[0] && i+1 <= r[1] {
+					found = true
+					break
+				}
+			}
+			// outside all ranges
+			if !found {
+				part2 += i - entry + 1
+				in = false
+			}
+		} else {
+			// out - look for an entry
+			for _, r := range ranges {
+				if i >= r[0] && i <= r[1] {
+					in = true
+					entry = i
+					break
+				}
+			}
 		}
-
-		part2 += r[1] - r[0] + 1
 	}
 
+	// 353863745078671 is correct
 	fmt.Println("Part 2:", part2, "in", time.Since(start))
 }
