@@ -5,45 +5,37 @@ import (
 	"time"
 
 	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/advent-of-code/util"
-	. "github.com/wederbrand/advent-of-code/github.com/wederbrand/chart"
 )
 
 func main() {
 	start := time.Now()
 	input := GetFileContents("2025/07/input.txt", "\n")
-	m := MakeChart(input, "")
-	sInput, _ := m.FindLetter("S")
 
-	part2 := doIt(sInput, m)
-	part1 := len(seen)
+	part1, part2 := doIt(input)
 	fmt.Println("Part 1:", part1, "in", time.Since(start))
 	fmt.Println("Part 2:", part2, "in", time.Since(start))
 }
 
-var cache = make(map[Coord]int)
-var seen = make(map[Coord]bool)
-
-func doIt(sInput Coord, m Chart) int {
-	result := 0
-	found := false
-	if result, found = cache[sInput]; found {
-		return result
+func doIt(input []string) (int, int) {
+	beams := make([]int, len(input[0])+2)
+	splits := 0
+	for _, s := range input {
+		for x, r := range s {
+			if r == 'S' {
+				beams[x]++
+			} else if r == '^' && beams[x] > 0 {
+				beams[x-1] += beams[x]
+				beams[x+1] += beams[x]
+				beams[x] = 0
+				splits++
+			}
+		}
 	}
 
-	below, found := m[sInput.Move(DOWN)]
-	if !found {
-		// outside
-		result = 1
-	} else if below == "." {
-		// can fall down
-		result = doIt(sInput.Move(DOWN), m)
-	} else if below == "^" {
-		seen[sInput] = true
-		// split
-		result = doIt(sInput.Move(DOWNLEFT), m) + doIt(sInput.Move(DOWNRIGHT), m)
-	} else {
-		panic("ho ho ho")
+	timelines := 0
+	for _, beam := range beams {
+		timelines += beam
 	}
-	cache[sInput] = result
-	return result
+
+	return splits, timelines
 }
